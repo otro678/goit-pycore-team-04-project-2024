@@ -18,20 +18,36 @@ def input_error(func: Callable) -> Callable:
             return f"[{func.__name__}] {e}"
     return wrapper
 
+
 @input_error
 def add_contact(args: list, address_book: AddressBook) -> str:
-    if len(args) < 2:
-        raise ValueError("Not enough arguments. Input: add <name> <phone>")
+    if len(args) < 1:
+        raise ValueError("Not enough arguments. Input: add <name>")
 
-    data = {"name": ' '.join(args[:-1]), "phone": args[-1]}
-    record = address_book.find(data["name"])
-    if record is None:
-        record = Record(data["name"])
-        address_book.add_record(record)
-    if data["phone"]:
-        record.add_phone(data["phone"])
+    name = ' '.join(args)
+    if address_book.find(name):
+        raise ValueError(f"Contact with name {name} already exists.")
 
-    return f"Added {data['name']} with phone {data['phone']}"
+    record = Record(name)
+    address_book.add_record(record)
+
+    phones = input("Enter phone numbers (separated by space): ").split()
+    for phone in phones:
+        record.add_phone(phone)
+
+    email = input("Enter email: ")
+    if email:
+        record.add_email(email)
+
+    birthday = input("Enter birthday (DD.MM.YYYY): ")
+    if birthday:
+        record.add_birthday(birthday)
+
+    address = input("Enter address: ")
+    if address:
+        record.add_address(address)
+
+    return f"Added {record}"
 
 
 @input_error
@@ -132,7 +148,7 @@ def main():
                 print(show_birthday(args, address_book))
             case "birthdays":
                 print(birthdays(args, address_book))
-            case "exit" | "quit":
+            case "exit" | "quit" | "close":
                 break
             case _:
                 print("Invalid command.")

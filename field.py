@@ -25,6 +25,21 @@ class Phone(Field):
 class Birthday(Field):
     def __init__(self, value: str):
         try:
+            # TODO Add multiple bday formats & max age check
             self.value = datetime.strptime(value, "%d.%m.%Y")
         except ValueError:
             raise ValueError("Invalid date format. Use DD.MM.YYYY")
+
+class Email(Field):
+    def __init__(self, value):
+        self.value = self.validate_email(value)
+
+    def validate_email(self, email: str) -> str:
+        # TODO Replace with a correct check
+        if "@" not in email or "." not in email:
+            raise ValueError(f"Invalid email: {email}.")
+        return email
+
+
+class Address(Field):
+    pass
