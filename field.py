@@ -12,7 +12,7 @@ class Field:
         if strict:
             return self.value == value
 
-        return self.value.lower().find(value.lower()) >= 0
+        return type(self.value) is str and self.value.lower().find(value.lower()) >= 0
 
 
 class Name(Field):
@@ -36,6 +36,10 @@ class Birthday(Field):
             self.value = datetime.strptime(value, "%d.%m.%Y")
         except ValueError:
             raise ValueError("Invalid date format. Use DD.MM.YYYY")
+
+    def match(self, value, strict=False):
+        # TODO: let's discuss tomorrow if we're going to search by date
+        return False
 
 class Email(Field):
     def __init__(self, value):
