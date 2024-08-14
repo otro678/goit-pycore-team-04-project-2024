@@ -1,3 +1,4 @@
+import re
 from datetime import datetime
 
 class Field:
@@ -35,9 +36,9 @@ class Email(Field):
         self.value = self.validate_email(value)
 
     def validate_email(self, email: str) -> str:
-        # TODO Replace with a correct check
-        if "@" not in email or "." not in email:
-            raise ValueError(f"Invalid email: {email}.")
+        email_regex = r'^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$'
+        if re.match(email_regex, email):
+            raise ValueError("Invalid format of email: {email}.")
         return email
 
 
