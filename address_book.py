@@ -46,36 +46,40 @@ class AddressBook(UserDict):
         else:
             raise KeyError(f"A record with name {name} not found.")
 
-    def get_upcoming_birthdays(self) -> list:
+    def get_upcoming_birthdays(self, days_prior: int = 7) -> list:
         """
         Returns a list of upcoming birthdays (celebration days).
+        Parameters:
+            days_prior (int, optional): The number of days in the future to look for birthdays.
+                Defaults to 7.
         Returns:
             list: A list of dictionaries with names and celebration dates.
         """
         celebration_list = []
         current_date = date.today()
+        celebration_period = current_date + timedelta(days=days_prior)
         for name, record in self.data.items():
             # Birthday is an optional field. Skip if it's empty
             if record.birthday is None:
                 continue
 
             # prepare comparison data
-            birthday_this_year = record.birthday.value.replace(year=date.today().year).date()
+            celebration_date = record.birthday.value.replace(year=date.today().year).date()
 
             # if the birthday has already happened, we'll celebrate next year
-            if birthday_this_year < current_date:
-                continue
+            if celebration_date < current_date:
+                celebration_date = celebration_date.replace(year=celebration_date.year + 1)
 
             # if the birthday is on weekend, shift the celebration to the next Monday
-            birthday_week_day = birthday_this_year.weekday()
-            if birthday_week_day >= 5:
-                birthady_date_this_year = birthday_this_year + timedelta(days=7 - birthday_week_day)
-            else:
-                birthady_date_this_year = birthday_this_year
+            celebration_week_day = celebration_date.weekday()
+            if celebration_week_day >= 5:
+                celebration_date = celebration_date + timedelta(days=7 - celebration_week_day)
 
-            celebration_list.append({
-                "name": name,
-                "celebration_date": birthady_date_this_year})
+            # if the celebration date fits the celebration period, add it to the list
+            if celebration_date <= celebration_period:
+                celebration_list.append({
+                    "name": name,
+                    "celebration_date": celebration_date})
 
         return celebration_list
 

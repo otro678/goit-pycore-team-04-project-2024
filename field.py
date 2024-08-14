@@ -1,3 +1,4 @@
+import re
 from datetime import datetime
 
 class Field:
@@ -31,6 +32,21 @@ class Phone(Field):
 class Birthday(Field):
     def __init__(self, value: str):
         try:
-            super().__init__(datetime.strptime(value, "%d.%m.%Y"))
+            # TODO Add multiple bday formats & max age check
+            self.value = datetime.strptime(value, "%d.%m.%Y")
         except ValueError:
             raise ValueError("Invalid date format. Use DD.MM.YYYY")
+
+class Email(Field):
+    def __init__(self, value):
+        self.value = self.validate_email(value)
+
+    def validate_email(self, email: str) -> str:
+        email_regex = r'^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$'
+        if not re.match(email_regex, email):
+            raise ValueError(f"Invalid format of email: {email}.")
+        return email
+
+
+class Address(Field):
+    pass
