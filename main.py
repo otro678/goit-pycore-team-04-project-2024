@@ -128,14 +128,11 @@ def edit_name(args: list, address_book: AddressBook) -> str:
     if record is None:
         return f"Can't find contact with name {old_name}"
     
-    # Check if new name already exists
     if address_book.find(new_name):
         return f"A contact with name {new_name} already exists."
 
-    # Remove the record from the old name
     del address_book.data[old_name]
     
-    # Update the record's name and add it back under the new name
     record.name = Name(new_name)
     address_book.add_record(record)
     
