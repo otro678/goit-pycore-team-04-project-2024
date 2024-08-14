@@ -37,7 +37,7 @@ class Email(Field):
 
     def validate_email(self, email: str) -> str:
         email_regex = r'^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$'
-        if re.match(email_regex, email):
+        if not re.match(email_regex, email):
             raise ValueError("Invalid format of email: {email}.")
         return email
 
