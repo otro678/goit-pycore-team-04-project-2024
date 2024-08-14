@@ -85,11 +85,15 @@ class AddressBook(UserDict):
 
     def search_contacts(self, keyword: str, sort: str = "", direction_text: str = "asc") -> List[Record]:
         records = [record for record in self.data.values() if record.match(keyword)]
-        direction = True if direction_text == "asc" else False
+        direction = False if direction_text == "asc" else True
 
         match sort:
             case "name":
                 return sorted(records, key=lambda record: record.name.value, reverse=direction)
+            case "address":
+                return sorted(records, key=lambda record: record.address.value, reverse=direction)
+            case "email":
+                return sorted(records, key=lambda record: record.email.value, reverse=direction)
             case "phone":
                 return sorted(records, key=lambda record: "".join(phone.value for phone in record.phones), reverse=direction)
             case "birthday":

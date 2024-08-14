@@ -40,7 +40,9 @@ class Record:
     def match(self, keyword: str) -> bool:
         return (self.name.match(keyword)
                 or self.match_phone(keyword)
-                or self.birthday.match(keyword))
+                or self.birthday.match(keyword)
+                or self.email.match(keyword)
+                or self.address.match(keyword))
 
     def add_address(self, address: str):
         self.address = Address(address)
