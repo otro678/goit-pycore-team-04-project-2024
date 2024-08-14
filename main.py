@@ -1,7 +1,7 @@
 from functools import wraps
 from typing import Callable
 from address_book import AddressBook
-from record import Record, Phone
+from record import Record, Phone, Name
 from serialization import save_data, load_data
 
 
@@ -117,6 +117,31 @@ def edit_contact(args: list, address_book: AddressBook) -> str:
     return f"Contact {record.name.value} updated"
 
 @input_error
+def edit_name(args: list, address_book: AddressBook) -> str:
+    if len(args) < 2:
+        raise ValueError("Not enough arguments. Input: edit-name <old_name> <new_name>")
+    
+    old_name = args[0]
+    new_name = args[1]
+    
+    record = address_book.find(old_name)
+    if record is None:
+        return f"Can't find contact with name {old_name}"
+    
+    # Check if new name already exists
+    if address_book.find(new_name):
+        return f"A contact with name {new_name} already exists."
+
+    # Remove the record from the old name
+    del address_book.data[old_name]
+    
+    # Update the record's name and add it back under the new name
+    record.name = Name(new_name)
+    address_book.add_record(record)
+    
+    return f"Renamed contact {old_name} to {new_name}"
+
+@input_error
 def show_all(address_book: AddressBook) -> str:
     if address_book.data:
         return address_book
@@ -183,6 +208,8 @@ def main():
                 print(edit_bday(args, address_book))
             case "edit-contact":
                 print(edit_contact(args, address_book))
+            case "edit-name":
+                print(edit_name(args, address_book))
             case "all":
                 print(show_all(address_book))
             case "add-birthday":
