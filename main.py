@@ -18,6 +18,13 @@ def input_error(func: Callable) -> Callable:
             return f"[{func.__name__}] {e}"
     return wrapper
 
+def populate_field(field, func, message):
+    if isinstance(field, list):
+        input_string = input(message).split()
+        for substring in input_string:
+            func(substring)
+    else:
+        func(input(message))
 
 @input_error
 def add_contact(args: list, address_book: AddressBook) -> str:
@@ -31,22 +38,11 @@ def add_contact(args: list, address_book: AddressBook) -> str:
     record = Record(name)
     address_book.add_record(record)
 
-    phones = input("Enter phone numbers (separated by space): ").split()
-    for phone in phones:
-        record.add_phone(phone)
-
-    email = input("Enter email: ")
-    if email:
-        record.add_email(email)
-
-    birthday = input("Enter birthday (DD.MM.YYYY): ")
-    if birthday:
-        record.add_birthday(birthday)
-
-    address = input("Enter address: ")
-    if address:
-        record.add_address(address)
-
+    populate_field(record.phones, record.add_phone, "Enter phone numbers (separated by space): ")
+    populate_field(record.email, record.add_email, "Enter email: ")
+    populate_field(record.birthday, record.add_birthday, "Enter birthday (DD.MM.YYYY): ")
+    populate_field(record.address, record.add_address, "Enter address: ")
+    
     return f"Added {record}"
 
 
