@@ -1,10 +1,12 @@
+from typing import List
+
 from field import Name, Phone, Birthday
 
 class Record:
     def __init__(self, name):
-        self.name = Name(name)
-        self.phones = []
-        self.birthday = None
+        self.name: Name = Name(name)
+        self.phones: List[Phone] = []
+        self.birthday: Birthday | None = None
 
     def __str__(self):
         return f"Contact name: {self.name.value}, phones: {'; '.join(p.value for p in self.phones)}"
@@ -34,3 +36,11 @@ class Record:
 
     def add_birthday(self, birthday: str):
         self.birthday = Birthday(birthday)
+
+    def match_phone(self, phone: str) -> bool:
+        return any([record.match(phone) for record in self.phones])
+
+    def match(self, keyword: str) -> bool:
+        return (self.name.match(keyword)
+                or self.match_phone(keyword)
+                or self.birthday.match(keyword))
