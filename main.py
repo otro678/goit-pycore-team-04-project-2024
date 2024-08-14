@@ -19,12 +19,19 @@ def input_error(func: Callable) -> Callable:
     return wrapper
 
 def populate_field(field, func, message):
-    if isinstance(field, list):
-        input_string = input(message).split()
-        for substring in input_string:
-            func(substring)
-    else:
-        func(input(message))
+    while True:
+        try:
+            if isinstance(field, list):
+                input_strings = input(message).split()
+                for substring in input_strings:
+                    func(substring)
+                break
+            else:
+                func(input(message))
+                break
+        except ValueError as e:
+            print(e)
+
 
 @input_error
 def add_contact(args: list, address_book: AddressBook) -> str:
