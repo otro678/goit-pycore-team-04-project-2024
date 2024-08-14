@@ -1,5 +1,6 @@
 from functools import wraps
-from typing import Callable
+import shlex
+from typing import Callable, List
 from address_book import AddressBook
 from record import Record, Phone, Name
 from serialization import save_data, load_data
@@ -171,6 +172,20 @@ def show_birthday(args, address_book: AddressBook) -> str:
         return f"{name} birthday is {record.birthday}"
     return f"Can't find {name} name"
 
+@input_error
+def search_contacts(args: list, address_book: AddressBook) -> List[Record]:
+    # TODO: code smells should be handled with commands class
+    sort = direction = ""
+    if len(args) == 0:
+        raise ValueError("Not enough arguments. Input: search <name>")
+    if len(args) > 1:
+        sort_commands = args[1].split(":")
+        if sort_commands[0] != "sort":
+            raise ValueError(f"Sort command {sort_commands[0]} is not supported")
+        sort = "" if len(sort_commands) < 2 else sort_commands[1]
+        direction = "" if len(sort_commands) < 3 else sort_commands[2]
+    return address_book.search_contacts(args[0], sort, direction)
+
 
 @input_error
 def birthdays(args, address_book: AddressBook) -> list:
@@ -178,7 +193,7 @@ def birthdays(args, address_book: AddressBook) -> list:
 
 
 def parse_input(input_str: str) -> tuple:
-    command, *args = input_str.split()
+    command, *args = shlex.split(input_str)
     command = command.strip().lower()
     return command, *args
 
@@ -215,6 +230,12 @@ def main():
                 print(show_birthday(args, address_book))
             case "birthdays":
                 print(birthdays(args, address_book))
+            case "search-contacts":
+                records = search_contacts(args, address_book)
+                if type(records) is list:
+                    print("\n".join(str(record) for record in records))
+                else:
+                    print(records)
             case "exit" | "quit" | "close":
                 break
             case _:

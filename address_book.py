@@ -1,13 +1,13 @@
 from collections import UserDict
 from datetime import date, timedelta
-from record import Record
+from typing import NamedTuple, List
 
+from record import Record
 
 class AddressBook(UserDict):
     """
     A simple address book implementation that stores records in a dictionary.
     """
-
     def __str__(self) -> str:
         return "\n".join([str(record) for record in self.data.values()])
 
@@ -82,3 +82,22 @@ class AddressBook(UserDict):
                     "celebration_date": celebration_date})
 
         return celebration_list
+
+    def search_contacts(self, keyword: str, sort: str = "", direction_text: str = "asc") -> List[Record]:
+        records = [record for record in self.data.values() if record.match(keyword)]
+        direction = False if direction_text == "asc" else True
+
+        match sort:
+            case "name":
+                return sorted(records, key=lambda record: record.name.value, reverse=direction)
+            case "address":
+                return sorted(records, key=lambda record: record.address.value, reverse=direction)
+            case "email":
+                return sorted(records, key=lambda record: record.email.value, reverse=direction)
+            case "phone":
+                return sorted(records, key=lambda record: "".join(phone.value for phone in record.phones), reverse=direction)
+            case "birthday":
+                return sorted(records, key=lambda record: record.birthday.value, reverse=direction)
+            case _:
+                return records
+

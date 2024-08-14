@@ -1,3 +1,4 @@
+from typing import List
 from field import Name, Phone, Birthday, Email, Address
 
 
@@ -32,6 +33,16 @@ class Record:
 
     def add_birthday(self, birthday: str):
         self.birthday = Birthday(birthday)
+
+    def match_phone(self, phone: str) -> bool:
+        return any([record.match(phone) for record in self.phones])
+
+    def match(self, keyword: str) -> bool:
+        return (self.name.match(keyword)
+                or self.match_phone(keyword)
+                or self.birthday.match(keyword)
+                or self.email.match(keyword)
+                or self.address.match(keyword))
 
     def add_address(self, address: str):
         self.address = Address(address)
