@@ -2,7 +2,9 @@ from functools import wraps
 import shlex
 from typing import Callable, List
 from address_book import AddressBook
+from notes_book import Notebook
 from record import Record, Phone, Name
+from note import Note
 from serialization import save_data, load_data
 
 
@@ -192,6 +194,24 @@ def birthdays(args, address_book: AddressBook) -> list:
     return address_book.get_upcoming_birthdays()
 
 
+@input_error
+def add_note(args: list, notes_book: Notebook) -> str:
+    if len(args) < 1:
+        raise ValueError("Not enough arguments. Input: add-note \"<title>\"")
+
+    title = ' '.join(args)
+    body = input("Enter body: ")
+
+    note = Note(title, body)
+    notes_book.add_note(note)
+    return f"Added {note}"
+
+
+@input_error
+def show_notes(notes_book: Notebook) -> str:
+    return "\n".join([str(note) for note in notes_book.get_notes()])
+
+
 def parse_input(input_str: str) -> tuple:
     command, *args = shlex.split(input_str)
     command = command.strip().lower()
@@ -200,6 +220,7 @@ def parse_input(input_str: str) -> tuple:
 
 def main():
     address_book = load_data()
+    notes_book = Notebook() #TODO: [SB-29] deserialize notes_book here
     print("Welcome to the assistant bot!")
     while True:
         input_str = input("Enter command: ")
@@ -236,12 +257,17 @@ def main():
                     print("\n".join(str(record) for record in records))
                 else:
                     print(records)
+            case "add-note":
+                print(add_note(args, notes_book))
+            case "all-notes":
+                print(show_notes(notes_book))
             case "exit" | "quit" | "close":
                 break
             case _:
                 print("Invalid command.")
 
     save_data(address_book)
+    #TODO: [SB-29] serialize notes_book here
     print("Good bye!")
 
 
