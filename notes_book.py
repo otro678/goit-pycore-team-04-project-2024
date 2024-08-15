@@ -14,14 +14,17 @@ class Notebook(UserList):
             raise ValueError("Note with this title already exists")
         self.data.append(note)
 
+    def remove_note(self, title: str):
+        note = self.get_note_by_title(title)
+        if note is None:
+            raise ValueError("Note with this title doesn't exist")
+        self.data.remove(note)
+
     def get_notes(self) -> list:
         return self.data
 
     def get_note_by_title(self, title: str) -> Note:
-        for note in self.data:
-            if note.title == title:
-                return note
-        return None
+        return next((note for note in self.data if note.title == title), None)
 
     @staticmethod
     def update_note(note_base: Note, new_note: Note):

@@ -233,6 +233,15 @@ def edit_note(args: list, notes_book: Notebook) -> str:
     notes_book.update_note(note, new_note)
     return f"Edited note {note}"
 
+@input_error
+def remove_note(args: list, notes_book: Notebook) -> str:
+    if len(args) < 1:
+        raise ValueError("Not enough arguments. Input: remove-note \"<title>\"")
+
+    title = ' '.join(args)
+    notes_book.remove_note(title)
+    return f"Removed note with title {title}"
+
 
 def parse_input(input_str: str) -> tuple:
     command, *args = shlex.split(input_str)
@@ -283,6 +292,8 @@ def main():
                 print(add_note(args, notes_book))
             case "edit-note":
                 print(edit_note(args, notes_book))
+            case "delete-note":
+                print(remove_note(args, notes_book))
             case "all-notes":
                 print(show_notes(notes_book))
             case "exit" | "quit" | "close":
