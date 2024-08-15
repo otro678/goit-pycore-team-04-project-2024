@@ -195,8 +195,11 @@ def birthdays(args, address_book: AddressBook) -> list:
 
 
 @input_error
-def add_note(notes_book: Notebook) -> str:
-    title = input("Enter title: ")
+def add_note(args: list, notes_book: Notebook) -> str:
+    if len(args) < 1:
+        raise ValueError("Not enough arguments. Input: add-note \"<title>\"")
+
+    title = ' '.join(args)
     body = input("Enter body: ")
 
     note = Note(title, body)
@@ -206,8 +209,8 @@ def add_note(notes_book: Notebook) -> str:
 
 @input_error
 def show_notes(notes_book: Notebook) -> str:
-    #TODO: should be replaced with a proper visualizer later
-    return notes_book
+    return "\n".join([str(note) for note in notes_book.get_notes()])
+
 
 def parse_input(input_str: str) -> tuple:
     command, *args = shlex.split(input_str)
@@ -255,8 +258,8 @@ def main():
                 else:
                     print(records)
             case "add-note":
-                print(add_note(notes_book))
-            case "show-notes":
+                print(add_note(args, notes_book))
+            case "all-notes":
                 print(show_notes(notes_book))
             case "exit" | "quit" | "close":
                 break
