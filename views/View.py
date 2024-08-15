@@ -23,7 +23,7 @@ class View:
             console.print("Records not found!", style="bold red",  justify="center")
             return
 
-        table = Table(title="Addressbook view")
+        table = Table(title=self.title)
 
         for column in self.header:
             if sort_column.column == column.lower():
