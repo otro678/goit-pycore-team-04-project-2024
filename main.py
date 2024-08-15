@@ -5,7 +5,7 @@ from address_book import AddressBook
 from notes_book import Notebook
 from record import Record, Phone, Name
 from note import Note
-from serialization import save_data, load_data
+from serialization import save_data, load_contacts, load_notes
 
 
 def input_error(func: Callable) -> Callable:
@@ -158,6 +158,13 @@ def show_all(address_book: AddressBook) -> str:
         return address_book
     else:
         return "No contacts"
+    
+@input_error
+def show_all(notes_book: Notebook) -> str:
+    if notes_book.data:
+        return notes_book
+    else:
+        return "No notes"
 
 
 @input_error
@@ -277,8 +284,8 @@ def parse_input(input_str: str) -> tuple:
 
 
 def main():
-    address_book = load_data()
-    notes_book = Notebook() #TODO: [SB-29] deserialize notes_book here
+    address_book = load_contacts()
+    notes_book = load_notes()
     print("Welcome to the assistant bot!")
     while True:
         input_str = input("Enter command: ")
@@ -305,6 +312,7 @@ def main():
                 print(edit_name(args, address_book))
             case "all":
                 print(show_all(address_book))
+                print(show_all(notes_book))
             case "add-birthday":
                 print(add_birthday(args, address_book))
             case "show-birthday":
@@ -329,7 +337,7 @@ def main():
                 print("Invalid command.")
 
     save_data(address_book)
-    #TODO: [SB-29] serialize notes_book here
+    save_data(notes_book, filename="notes.pkl")
     print("Good bye!")
 
 
