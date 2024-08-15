@@ -199,10 +199,11 @@ def add_note(args: list, notes_book: Notebook) -> str:
     if len(args) < 1:
         raise ValueError("Not enough arguments. Input: add-note \"<title>\"")
 
-    title = ' '.join(args)
-    body = input("Enter body: ")
+    note = Note()
+    note.title = ' '.join(args)
+    note.body = input("Enter body: ")
+    note.tags = input("Enter tags separated by comma: ").split(",")
 
-    note = Note(title, body)
     notes_book.add_note(note)
     return f"Added {note}"
 
