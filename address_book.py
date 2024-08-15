@@ -1,8 +1,10 @@
 from collections import UserDict
 from datetime import date, timedelta
-from typing import NamedTuple, List
 
 from record import Record
+from views.AddressBookView import AddressBookView
+from views.View import View, Sort
+
 
 class AddressBook(UserDict):
     """
@@ -83,21 +85,23 @@ class AddressBook(UserDict):
 
         return celebration_list
 
-    def search_contacts(self, keyword: str, sort: str = "", direction_text: str = "asc") -> List[Record]:
+    def search_contacts(self, keyword: str, sort: str = "", direction_text: str = "asc") -> None:
         records = [record for record in self.data.values() if record.match(keyword)]
         direction = False if direction_text == "asc" else True
 
         match sort:
             case "name":
-                return sorted(records, key=lambda record: record.name.value, reverse=direction)
+                records = sorted(records, key=lambda record: record.name.value, reverse=direction)
             case "address":
-                return sorted(records, key=lambda record: record.address.value, reverse=direction)
+                records = sorted(records, key=lambda record: record.address.value, reverse=direction)
             case "email":
-                return sorted(records, key=lambda record: record.email.value, reverse=direction)
+                records = sorted(records, key=lambda record: record.email.value, reverse=direction)
             case "phone":
-                return sorted(records, key=lambda record: "".join(phone.value for phone in record.phones), reverse=direction)
+                records = sorted(records, key=lambda record: "".join(phone.value for phone in record.phones), reverse=direction)
             case "birthday":
-                return sorted(records, key=lambda record: record.birthday.value, reverse=direction)
+                records = sorted(records, key=lambda record: record.birthday.value, reverse=direction)
             case _:
-                return records
+                pass
 
+        view = AddressBookView(records)
+        view.output(sort_column=Sort(column=sort, order=direction_text), keyword=keyword)
