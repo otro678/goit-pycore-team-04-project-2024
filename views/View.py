@@ -26,7 +26,6 @@ class View:
         table = Table(title=self.title)
 
         for column in self.header:
-            print(str(column))
             if sort_column.column == column.lower():
                 table.add_column(f"{column} {"▲" if sort_column.order == "asc" else "▼"}", style="cyan", header_style="bold cyan")
             else:
