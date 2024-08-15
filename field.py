@@ -46,6 +46,8 @@ class Birthday(Field):
             raise ValueError("Invalid date format. Try DD.MM.YYYY")
         if (datetime.now() - birth_date).days / 365 > 115:
             raise ValueError("Year of birth seems to be incorrect. Or you might be not alive already.")
+        if (datetime.now() < birth_date):
+            raise ValueError("Year of birth seems to be incorrect. Or you are not born yet.")
         return birth_date
             
     def match(self, value, strict=False):
