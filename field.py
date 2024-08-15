@@ -24,9 +24,16 @@ class Phone(Field):
         super().__init__(self.validated_phone(value))
 
     def validated_phone(self, phone: str) -> str:
-        if not len(phone) == 10 and phone.isdigit():
-            raise ValueError("Invalid phone number: {phone}. Must be 10-digits long.")
-        return phone
+        pattern = r"^(\(?\d{3}\)?[-]?\d{2,3}[-]?\d{2}[-]?\d{2,4}|\d{10})$"
+        if not re.match(pattern, phone):
+            raise ValueError(f"Invalid phone number: {phone}.")
+        
+        clean_phone = re.sub(r'\D', '', phone)
+
+        if len(clean_phone) != 10:
+            raise ValueError(f"Invalid phone number: {phone}. It should contain exactly 10 digits.")
+
+        return clean_phone
 
 
 class Birthday(Field):
