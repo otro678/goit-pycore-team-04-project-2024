@@ -1,6 +1,6 @@
 from typing import List
 
-from note import Note
+from note import Note, NOTES_BOOK_FIELDS
 from views.View import View
 
 class NotesBookView(View):
@@ -9,7 +9,7 @@ class NotesBookView(View):
     def __init__(self, contact_list: List[Note]):
         # possible validation of type
         super().__init__(contact_list)
-        self.header = ['Title', 'Body', 'Tags']
+        self.header = [NOTES_BOOK_FIELDS.TITLE.value, NOTES_BOOK_FIELDS.BODY.value, NOTES_BOOK_FIELDS.TAGS.value]
         self.title = "Notes book view"
 
     def get_row(self, record: Note, keyword: str):

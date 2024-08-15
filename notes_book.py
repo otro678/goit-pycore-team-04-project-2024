@@ -1,8 +1,9 @@
 from collections import UserList
-from note import Note
-from views.NotesBookView import NotesBookView
-from views.View import View, Sort
+from typing import List
 
+from note import Note, NOTES_BOOK_FIELDS
+from views.View import View, Sort
+from views.NotesBookView import NotesBookView
 
 class Notebook(UserList):
 
@@ -43,7 +44,7 @@ class Notebook(UserList):
         if len(new_note.tags) > 0:
             note_base.tags = new_note.tags
 
-    def search_notes(self, keyword: str, sort: str = "", direction_text: str = "asc") -> None:
+    def search(self, keyword: str, field: NOTES_BOOK_FIELDS, sort: NOTES_BOOK_FIELDS, direction_text: str = "asc") -> None:
         records = [record for record in self.data if record.match(keyword)]
         direction = False if direction_text == "asc" else True
 
@@ -60,3 +61,31 @@ class Notebook(UserList):
         view = NotesBookView(records)
         view.output(sort_column=Sort(column=sort, order=direction_text), keyword=keyword)
 
+    def __filter(self, keyword: str, field: NOTES_BOOK_FIELDS) -> List[Note]:
+        notes = self.data
+        match field:
+            case NOTES_BOOK_FIELDS.ALL:
+                notes = [note for note in notes if note.match(keyword)]
+            case NOTES_BOOK_FIELDS.TAGS:
+                notes = [note for note in notes if any([note.tag.lower().find(keyword.lower()) >= 0 for tag in self.tags])]
+            case NOTES_BOOK_FIELDS.BODY:
+                notes = [note for note in notes if note.body.lower().find(keyword.lower()) >= 0]
+            case NOTES_BOOK_FIELDS.TITLE:
+                notes = [note for note in notes if note.title.lower().find(keyword.lower()) >= 0]
+
+        return notes
+
+    def __sort(self, notes: List[Note], field: NOTES_BOOK_FIELDS, direction_text: str) -> List[Note]:
+        direction = False if direction_text == "asc" else True
+
+        match field:
+            case NOTES_BOOK_FIELDS.TAGS:
+                notes = sorted(notes, key=lambda note: "".join(tag for tag in note.tags), reverse=direction)
+            case NOTES_BOOK_FIELDS.BODY:
+                notes = sorted(notes, key=lambda note: note.body, reverse=direction)
+            case NOTES_BOOK_FIELDS.TITLE:
+                notes = sorted(notes, key=lambda note: note.title, reverse=direction)
+            case _:
+                pass
+
+        return notes

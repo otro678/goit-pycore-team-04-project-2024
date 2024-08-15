@@ -1,5 +1,15 @@
+from enum import Enum
 from typing import List
 from field import Name, Phone, Birthday, Email, Address
+
+class ADDRESS_BOOK_FIELDS(str, Enum):
+    EMPTY = "",
+    ALL = "all",
+    NAME = "name",
+    ADDRESS = "address",
+    EMAIL = "email",
+    PHONE = "phone",
+    BIRTHDAY = "birthday",
 
 
 class Record:

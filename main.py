@@ -1,8 +1,8 @@
 from functools import wraps
 import shlex
 from typing import Callable, List
-from address_book import AddressBook
-from notes_book import Notebook
+from address_book import AddressBook, ADDRESS_BOOK_FIELDS
+from notes_book import Notebook, NOTES_BOOK_FIELDS
 from record import Record, Phone, Name
 from note import Note
 from serialization import save_data, load_data
@@ -186,26 +186,46 @@ def show_birthday(args, address_book: AddressBook) -> str:
     return f"Can't find {name} name"
 
 @input_error
-def search_notes(args: list, notes_book: Notebook) -> None:
-    # TODO: code smells should be handled with commands class
-    sort = direction = ""
-    if len(args) == 0:
-        raise ValueError("Not enough arguments. Input: search-notes [keyword] [sort]:[field]:[direction]")
-    if len(args) > 1:
-        sort_commands = args[1].split(":")
-        if sort_commands[0] != "sort":
-            raise ValueError(f"Sort command {sort_commands[0]} is not supported")
-        sort = "" if len(sort_commands) < 2 else sort_commands[1]
-        direction = "" if len(sort_commands) < 3 else sort_commands[2]
-
-    notes_book.search_notes(args[0], sort, direction)
+def search_name(args: list, address_book: AddressBook):
+    search(args, address_book, ADDRESS_BOOK_FIELDS.NAME)
 
 @input_error
-def search_contacts(args: list, address_book: AddressBook) -> None:
+def search_address(args: list, address_book: AddressBook):
+    search(args, address_book, ADDRESS_BOOK_FIELDS.ADDRESS)
+
+@input_error
+def search_email(args: list, address_book: AddressBook):
+    search(args, address_book, ADDRESS_BOOK_FIELDS.EMAIL)
+
+@input_error
+def search_phone(args: list, address_book: AddressBook):
+    search(args, address_book, ADDRESS_BOOK_FIELDS.PHONE)
+
+@input_error
+def search_tags(args: list, notes_book: Notebook):
+    search(args, notes_book, NOTES_BOOK_FIELDS.TAGS)
+
+@input_error
+def search_body(args: list, notes_book: Notebook):
+    search(args, notes_book, NOTES_BOOK_FIELDS.BODY)
+
+@input_error
+def search_title(args: list, notes_book: Notebook):
+    search(args, notes_book, NOTES_BOOK_FIELDS.TITLE)
+
+@input_error
+def search_notes_all_fields(args: list, notes_book: Notebook):
+    search(args, notes_book, NOTES_BOOK_FIELDS.ALL)
+
+@input_error
+def search_contacts_all_fields(args: list, address_book: AddressBook):
+    search(args, address_book, ADDRESS_BOOK_FIELDS.ALL)
+
+def search(args: list, book: Notebook | AddressBook, field: ADDRESS_BOOK_FIELDS | NOTES_BOOK_FIELDS):
     # TODO: code smells should be handled with commands class
     sort = direction = ""
     if len(args) == 0:
-        raise ValueError("Not enough arguments. Input: search-contacts [keyword] [sort]:[field]:[direction]")
+        raise ValueError("Not enough arguments. Input: search[-entity] [keyword] [sort]:[field]:[direction]")
     if len(args) > 1:
         sort_commands = args[1].split(":")
         if sort_commands[0] != "sort":
@@ -213,8 +233,7 @@ def search_contacts(args: list, address_book: AddressBook) -> None:
         sort = "" if len(sort_commands) < 2 else sort_commands[1]
         direction = "" if len(sort_commands) < 3 else sort_commands[2]
 
-    address_book.search_contacts(args[0], sort, direction)
-
+    book.search(args[0], field, sort, direction)
 
 @input_error
 def birthdays(args, address_book: AddressBook) -> list:
@@ -312,7 +331,15 @@ def main():
             case "birthdays":
                 print(birthdays(args, address_book))
             case "search-contacts":
-                search_contacts(args, address_book)
+                search_contacts_all_fields(args, address_book)
+            case "search-name":
+                search_name(args, address_book)
+            case "search-phone":
+                search_phone(args, address_book)
+            case "search-email":
+                search_email(args, address_book)
+            case "search-address":
+                search_address(args, address_book)
             case "add-note":
                 print(add_note(args, notes_book))
             case "edit-note":
@@ -322,7 +349,13 @@ def main():
             case "all-notes":
                 print(show_notes(notes_book))
             case "search-notes":
-                search_notes(args, notes_book)
+                search_notes_all_fields(args, notes_book)
+            case "search-tag":
+                search_tags(args, notes_book)
+            case "search-title":
+                search_tags(args, notes_book)
+            case "search-body":
+                search_body(args, notes_book)
             case "exit" | "quit" | "close":
                 break
             case _:
