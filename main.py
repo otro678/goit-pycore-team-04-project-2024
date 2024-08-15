@@ -79,6 +79,17 @@ def replace_phones_on_a_contact(record, allow_skip=False):
     elif not new_phones and record.phones:
         record.phones = existing_phones
 
+@input_error
+def delete_contact(args: list, address_book: AddressBook) -> str:
+    if len(args) < 1:
+        raise ValueError("Not enough arguments. Input: delete-contact <name>")
+
+    name = ' '.join(args)
+    if not address_book.find(name):
+        raise ValueError(f"Contact with name {name} does not exist.")
+
+    address_book.delete(name)
+    return f"Contact with name {name} deleted"
 
 @input_error
 def edit_phone(args: list, address_book: AddressBook) -> str:
@@ -278,6 +289,8 @@ def main():
                 print("How can I help you?")
             case "add":
                 print(add_contact(args, address_book))
+            case "delete-contact":
+                print(delete_contact(args, address_book))
             case "edit-phone":
                 print(edit_phone(args, address_book))
             case "edit-email":
