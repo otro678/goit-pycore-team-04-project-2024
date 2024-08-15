@@ -41,7 +41,7 @@ class View:
         console.print(table, justify="center")
 
     def escape(self, s: str, keyword: str) -> str:
-        return re.sub(rf"({keyword})", r"[b magenta not dim]\1[/]", s)
+        return re.sub(rf"({keyword})", r"[b magenta not dim]\1[/]", s, flags=re.IGNORECASE)
 
     def get_row(self, record: any, keyword: any) -> List[str]:
         raise NotImplementedError("get_row is not implemented")
