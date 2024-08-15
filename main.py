@@ -2,7 +2,9 @@ from functools import wraps
 import shlex
 from typing import Callable, List
 from address_book import AddressBook
+from notes_book import Notebook
 from record import Record, Phone, Name
+from note import Note
 from serialization import save_data, load_data
 
 
@@ -193,6 +195,55 @@ def birthdays(args, address_book: AddressBook) -> list:
     return address_book.get_upcoming_birthdays()
 
 
+@input_error
+def add_note(args: list, notes_book: Notebook) -> str:
+    if len(args) < 1:
+        raise ValueError("Not enough arguments. Input: add-note \"<title>\"")
+
+    note = Note()
+    note.title = ' '.join(args)
+    note.body = input("Enter body: ")
+    note.tags = input("Enter tags separated by comma: ").split(",")
+
+    notes_book.add_note(note)
+    return f"Added {note}"
+
+
+@input_error
+def show_notes(notes_book: Notebook) -> str:
+    return "\n".join([str(note) for note in notes_book.get_notes()])
+
+
+@input_error
+def edit_note(args: list, notes_book: Notebook) -> str:
+    if len(args) < 1:
+        raise ValueError("Not enough arguments. Input: edit-note \"<title>\"")
+
+    title = ' '.join(args)
+    note = notes_book.get_note_by_title(title)
+    if note is None:
+        return f"Can't find a note with title {title}. Current notes: \n{show_notes(notes_book)}"
+
+    # Populate a fresh Note with values to update the existing one
+    new_note = Note()
+    new_note.title = input(f"Enter new title (current: {note.title}): ")
+    new_note.body = input(f"Enter new body (current: {note.body}): ")
+    current_tags = ",".join(note.tags)
+    new_note.tags = input(f"Enter new tags (current: {current_tags}): ").split(",")
+
+    notes_book.update_note(note, new_note)
+    return f"Edited note {note}"
+
+@input_error
+def remove_note(args: list, notes_book: Notebook) -> str:
+    if len(args) < 1:
+        raise ValueError("Not enough arguments. Input: remove-note \"<title>\"")
+
+    title = ' '.join(args)
+    notes_book.remove_note(title)
+    return f"Removed note with title {title}"
+
+
 def parse_input(input_str: str) -> tuple:
     command, *args = shlex.split(input_str)
     command = command.strip().lower()
@@ -201,6 +252,7 @@ def parse_input(input_str: str) -> tuple:
 
 def main():
     address_book = load_data()
+    notes_book = Notebook() #TODO: [SB-29] deserialize notes_book here
     print("Welcome to the assistant bot!")
     while True:
         input_str = input("Enter command: ")
@@ -237,12 +289,21 @@ def main():
                     print("\n".join(str(record) for record in records))
                 else:
                     print(records)
+            case "add-note":
+                print(add_note(args, notes_book))
+            case "edit-note":
+                print(edit_note(args, notes_book))
+            case "delete-note":
+                print(remove_note(args, notes_book))
+            case "all-notes":
+                print(show_notes(notes_book))
             case "exit" | "quit" | "close":
                 break
             case _:
                 print("Invalid command.")
 
     save_data(address_book)
+    #TODO: [SB-29] serialize notes_book here
     print("Good bye!")
 
 
