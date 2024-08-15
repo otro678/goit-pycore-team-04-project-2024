@@ -213,6 +213,27 @@ def show_notes(notes_book: Notebook) -> str:
     return "\n".join([str(note) for note in notes_book.get_notes()])
 
 
+@input_error
+def edit_note(args: list, notes_book: Notebook) -> str:
+    if len(args) < 1:
+        raise ValueError("Not enough arguments. Input: edit-note \"<title>\"")
+
+    title = ' '.join(args)
+    note = notes_book.get_note_by_title(title)
+    if note is None:
+        return f"Can't find a note with title {title}. Current notes: \n{show_notes(notes_book)}"
+
+    # Populate a fresh Note with values to update the existing one
+    new_note = Note()
+    new_note.title = input(f"Enter new title (current: {note.title}): ")
+    new_note.body = input(f"Enter new body (current: {note.body}): ")
+    current_tags = ",".join(note.tags)
+    new_note.tags = input(f"Enter new tags (current: {current_tags}): ").split(",")
+
+    notes_book.update_note(note, new_note)
+    return f"Edited note {note}"
+
+
 def parse_input(input_str: str) -> tuple:
     command, *args = shlex.split(input_str)
     command = command.strip().lower()
@@ -260,6 +281,8 @@ def main():
                     print(records)
             case "add-note":
                 print(add_note(args, notes_book))
+            case "edit-note":
+                print(edit_note(args, notes_book))
             case "all-notes":
                 print(show_notes(notes_book))
             case "exit" | "quit" | "close":
