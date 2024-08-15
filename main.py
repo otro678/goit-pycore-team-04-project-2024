@@ -184,6 +184,7 @@ def search_contacts(args: list, address_book: AddressBook) -> List[Record]:
             raise ValueError(f"Sort command {sort_commands[0]} is not supported")
         sort = "" if len(sort_commands) < 2 else sort_commands[1]
         direction = "" if len(sort_commands) < 3 else sort_commands[2]
+
     return address_book.search_contacts(args[0], sort, direction)
 
 
