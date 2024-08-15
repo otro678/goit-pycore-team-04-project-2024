@@ -30,3 +30,8 @@ class Note:
     @tags.setter
     def tags(self, new_tags: list):
         self.__tags = new_tags
+
+    def match(self, keyword: str) -> bool:
+        return (self.__title.lower().find(keyword.lower()) >= 0
+                or self.__body.lower().find(keyword.lower()) >= 0
+                or any([tag.lower().find(keyword.lower()) >= 0 for tag in self.tags]))

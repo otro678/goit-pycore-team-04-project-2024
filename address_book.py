@@ -1,10 +1,9 @@
 from collections import UserDict
 from datetime import date, timedelta
-from typing import NamedTuple, List
 
 from record import Record
-from views.AddressBookView import AddressBookView, Sort
-from views.View import View
+from views.AddressBookView import AddressBookView
+from views.View import View, Sort
 
 
 class AddressBook(UserDict):
@@ -86,7 +85,7 @@ class AddressBook(UserDict):
 
         return celebration_list
 
-    def search_contacts(self, keyword: str, sort: str = "", direction_text: str = "asc") -> View:
+    def search_contacts(self, keyword: str, sort: str = "", direction_text: str = "asc") -> None:
         records = [record for record in self.data.values() if record.match(keyword)]
         direction = False if direction_text == "asc" else True
 

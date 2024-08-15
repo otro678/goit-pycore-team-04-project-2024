@@ -175,11 +175,11 @@ def show_birthday(args, address_book: AddressBook) -> str:
     return f"Can't find {name} name"
 
 @input_error
-def search_contacts(args: list, address_book: AddressBook) -> List[Record]:
+def search_notes(args: list, notes_book: Notebook) -> None:
     # TODO: code smells should be handled with commands class
     sort = direction = ""
     if len(args) == 0:
-        raise ValueError("Not enough arguments. Input: search <name>")
+        raise ValueError("Not enough arguments. Input: search-notes [keyword] [sort]:[field]:[direction]")
     if len(args) > 1:
         sort_commands = args[1].split(":")
         if sort_commands[0] != "sort":
@@ -187,7 +187,22 @@ def search_contacts(args: list, address_book: AddressBook) -> List[Record]:
         sort = "" if len(sort_commands) < 2 else sort_commands[1]
         direction = "" if len(sort_commands) < 3 else sort_commands[2]
 
-    return address_book.search_contacts(args[0], sort, direction)
+    notes_book.search_notes(args[0], sort, direction)
+
+@input_error
+def search_contacts(args: list, address_book: AddressBook) -> None:
+    # TODO: code smells should be handled with commands class
+    sort = direction = ""
+    if len(args) == 0:
+        raise ValueError("Not enough arguments. Input: search-contacts [keyword] [sort]:[field]:[direction]")
+    if len(args) > 1:
+        sort_commands = args[1].split(":")
+        if sort_commands[0] != "sort":
+            raise ValueError(f"Sort command {sort_commands[0]} is not supported")
+        sort = "" if len(sort_commands) < 2 else sort_commands[1]
+        direction = "" if len(sort_commands) < 3 else sort_commands[2]
+
+    address_book.search_contacts(args[0], sort, direction)
 
 
 @input_error
@@ -284,11 +299,7 @@ def main():
             case "birthdays":
                 print(birthdays(args, address_book))
             case "search-contacts":
-                records = search_contacts(args, address_book)
-                if type(records) is list:
-                    print("\n".join(str(record) for record in records))
-                else:
-                    print(records)
+                search_contacts(args, address_book)
             case "add-note":
                 print(add_note(args, notes_book))
             case "edit-note":
@@ -297,6 +308,8 @@ def main():
                 print(remove_note(args, notes_book))
             case "all-notes":
                 print(show_notes(notes_book))
+            case "search-notes":
+                search_notes(args, notes_book)
             case "exit" | "quit" | "close":
                 break
             case _:
