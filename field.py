@@ -31,12 +31,25 @@ class Phone(Field):
 
 class Birthday(Field):
     def __init__(self, value: str):
-        try:
-            # TODO Add multiple bday formats & max age check
-            self.value = datetime.strptime(value, "%d.%m.%Y")
-        except ValueError:
-            raise ValueError("Invalid date format. Use DD.MM.YYYY")
-
+        self.value = self.validate_birthday(value)
+        
+    def validate_birthday(self, value: str):
+        formats = ["%d.%m.%Y", "%d %m %Y","%d/%m/%Y", "%Y-%m-%d", "%d-%m-%Y"]
+        birth_date = None
+        for format in formats:
+            try:
+                birth_date = datetime.strptime(value, format)
+                break
+            except ValueError:
+                continue
+        if not birth_date:
+            raise ValueError("Invalid date format. Try DD.MM.YYYY")
+        if (datetime.now() - birth_date).days / 365 > 115:
+            raise ValueError("Year of birth seems to be incorrect. Or you might be not alive already.")
+        if (datetime.now() < birth_date):
+            raise ValueError("Year of birth seems to be incorrect. Or you are not born yet.")
+        return birth_date
+            
     def match(self, value, strict=False):
         # TODO: let's discuss tomorrow if we're going to search by date
         return False
