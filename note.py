@@ -5,7 +5,7 @@ class Note:
         self.__tags = []
 
     def __str__(self):
-        return f"Title: {self.__title}, Body: {self.__body}, Tags: {",".join(self.__tags)}"
+        return f"Title: {self.__title}, Body: {self.__body}, Tags: {','.join(self.__tags)}"
 
     @property
     def title(self) -> str:
