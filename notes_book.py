@@ -44,7 +44,7 @@ class Notebook(UserList):
         if len(new_note.tags) > 0:
             note_base.tags = new_note.tags
 
-    def search(self, keyword: str, field: NOTES_BOOK_FIELDS, sort: NOTES_BOOK_FIELDS, direction_text: str = "asc") -> None:
+    def search(self, keyword: str, field: NOTES_BOOK_FIELDS = NOTES_BOOK_FIELDS.ALL, sort: NOTES_BOOK_FIELDS = NOTES_BOOK_FIELDS.EMPTY, direction_text: str = "asc") -> None:
         if field not in NOTES_BOOK_FIELDS or sort not in NOTES_BOOK_FIELDS:
             raise KeyError(f"Field {field} not found.")
 

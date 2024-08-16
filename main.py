@@ -152,11 +152,8 @@ def edit_name(args: list, address_book: AddressBook) -> str:
     return f"Renamed contact {old_name} to {new_name}"
 
 @input_error
-def show_all(address_book: AddressBook) -> str:
-    if address_book.data:
-        return address_book
-    else:
-        return "No contacts"
+def show_all(address_book: AddressBook):
+    address_book.search("")
 
 
 @input_error
@@ -271,8 +268,8 @@ def add_note(args: list, notes_book: Notebook) -> str:
 
 
 @input_error
-def show_notes(notes_book: Notebook) -> str:
-    return "\n".join([str(note) for note in notes_book.get_notes()])
+def show_notes(notes_book: Notebook):
+    notes_book.search("")
 
 
 @input_error
@@ -283,7 +280,8 @@ def edit_note(args: list, notes_book: Notebook) -> str:
     title = ' '.join(args)
     note = notes_book.get_note_by_title(title)
     if note is None:
-        return f"Can't find a note with title {title}. Current notes: \n{show_notes(notes_book)}"
+        current_notes_list = "\n".join([str(note) for note in notes_book.get_notes()])
+        return f"Can't find a note with title {title}. Current notes: \n{current_notes_list}"
 
     # Populate a fresh Note with values to update the existing one
     new_note = Note()
@@ -363,7 +361,7 @@ def main():
             case "delete-note":
                 print(remove_note(args, notes_book))
             case "all-notes":
-                print(show_notes(notes_book))
+                show_notes(notes_book)
             case "search-notes":
                 search_notes_all_fields(args, notes_book)
             case "search-tag":
