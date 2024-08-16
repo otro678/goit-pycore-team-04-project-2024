@@ -35,28 +35,42 @@ class Phone(Field):
 
         return clean_phone
 
-
-class Birthday(Field):
+class Date(Field):
     def __init__(self, value: str):
-        self.value = self.validate_birthday(value)
-        
-    def validate_birthday(self, value: str):
+        self.value = self.validate_date(value)
+
+    def validate_date(self, value: str) -> datetime:
         formats = ["%d.%m.%Y", "%d %m %Y","%d/%m/%Y", "%Y-%m-%d", "%d-%m-%Y"]
         birth_date = None
-        for format in formats:
+        for date_format in formats:
             try:
-                birth_date = datetime.strptime(value, format)
+                birth_date = datetime.strptime(value, date_format)
                 break
             except ValueError:
                 continue
         if not birth_date:
             raise ValueError("Invalid date format. Try DD.MM.YYYY")
+
+        return birth_date
+
+
+class Birthday(Date):
+    def __init__(self, value: str):
+        self.value = self.validate_birthday(value)
+
+    def validate_birthday(self, value: str):
+        birth_date = self.validate_date(value)
         if (datetime.now() - birth_date).days / 365 > 115:
             raise ValueError("Year of birth seems to be incorrect. Or you might be not alive already.")
-        if (datetime.now() < birth_date):
+        if datetime.now() < birth_date:
             raise ValueError("Year of birth seems to be incorrect. Or you are not born yet.")
         return birth_date
-            
+
+    def is_between(self, from_date: Date | None, to_date: Date | None) -> bool:
+        res = from_date is None or self.value >= from_date.value
+        res &= to_date is None or self.value <= to_date.value
+        return res
+
     def match(self, value, strict=False):
         # TODO: let's discuss tomorrow if we're going to search by date
         return False

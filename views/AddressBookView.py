@@ -1,6 +1,6 @@
 from typing import List
 
-from record import Record
+from record import Record, ADDRESS_BOOK_FIELDS
 from views.View import View
 
 class AddressBookView(View):
@@ -9,7 +9,12 @@ class AddressBookView(View):
     def __init__(self, contact_list: List[Record]):
         # possible validation of type
         super().__init__(contact_list)
-        self.header = ['Name', 'Phone', 'Address', 'Birthday', 'Email']
+        self.header = [
+            ADDRESS_BOOK_FIELDS.NAME.value,
+            ADDRESS_BOOK_FIELDS.PHONE.value,
+            ADDRESS_BOOK_FIELDS.ADDRESS.value,
+            ADDRESS_BOOK_FIELDS.BIRTHDAY.value,
+            ADDRESS_BOOK_FIELDS.EMAIL.value]
         self.title = "Addressbook view"
 
     def get_row(self, record: Record, keyword: str):

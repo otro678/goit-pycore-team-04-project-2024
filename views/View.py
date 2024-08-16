@@ -20,7 +20,7 @@ class View:
         console = Console()
 
         if len(self.data) == 0:
-            console.print("Records not found!", style="bold red",  justify="center")
+            console.print(f"{self.title}. Records not found!", style="bold red",  justify="center")
             return
 
         table = Table(title=self.title)

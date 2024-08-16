@@ -1,3 +1,14 @@
+from enum import Enum
+
+
+class NOTES_BOOK_FIELDS(str, Enum):
+    EMPTY = "",
+    ALL = "all",
+    TITLE = "title",
+    BODY = "body",
+    TAGS = "tags",
+
+
 class Note:
     def __init__(self, title: str = "", body: str = ""):
         self.__title = title

@@ -1,12 +1,14 @@
 from collections import UserDict
 from datetime import date, timedelta
+from typing import List
 
-from record import Record
+from field import Date
+from record import Record, ADDRESS_BOOK_FIELDS
+from views.View import Sort
 from views.AddressBookView import AddressBookView
-from views.View import View, Sort
-
 
 class AddressBook(UserDict):
+
     """
     A simple address book implementation that stores records in a dictionary.
     """
@@ -85,23 +87,52 @@ class AddressBook(UserDict):
 
         return celebration_list
 
-    def search_contacts(self, keyword: str, sort: str = "", direction_text: str = "asc") -> None:
-        records = [record for record in self.data.values() if record.match(keyword)]
+    def search_by_date(self, from_date: Date, to_date: Date) -> None:
+        records = [record for record in self.data.values() if record.birthday.is_between(from_date=from_date, to_date=to_date)]
+        view = AddressBookView(records)
+        view.output(sort_column=Sort(column=ADDRESS_BOOK_FIELDS.BIRTHDAY, order="ask"), keyword="")
+
+    def search(self, keyword: str, field: ADDRESS_BOOK_FIELDS = ADDRESS_BOOK_FIELDS.ALL, sort: ADDRESS_BOOK_FIELDS = ADDRESS_BOOK_FIELDS.EMPTY, direction_text: str = "asc") -> None:
+        if field not in ADDRESS_BOOK_FIELDS or sort not in ADDRESS_BOOK_FIELDS:
+            raise KeyError(f"Field {field} not found.")
+
+        records = self.__filter(keyword, field)
+        records = self.__sort(records, field, direction_text)
+
+        view = AddressBookView(records)
+        view.output(sort_column=Sort(column=sort, order=direction_text), keyword=keyword)
+
+    def __filter(self, keyword: str, field: ADDRESS_BOOK_FIELDS):
+        records = self.data.values()
+        match field:
+            case ADDRESS_BOOK_FIELDS.ALL:
+                records = [record for record in records if record.match(keyword)]
+            case ADDRESS_BOOK_FIELDS.NAME:
+                records = [record for record in records if record.name.match(keyword)]
+            case ADDRESS_BOOK_FIELDS.ADDRESS:
+                records = [record for record in records if record.address.match(keyword)]
+            case ADDRESS_BOOK_FIELDS.EMAIL:
+                records = [record for record in records if record.email.match(keyword)]
+            case ADDRESS_BOOK_FIELDS.EMAIL:
+                records = [record for record in records if record.match_phone(keyword)]
+
+        return records
+
+    def __sort(self, records: List[Record], field: ADDRESS_BOOK_FIELDS, direction_text: str):
         direction = False if direction_text == "asc" else True
 
-        match sort:
-            case "name":
+        match field:
+            case ADDRESS_BOOK_FIELDS.NAME:
                 records = sorted(records, key=lambda record: record.name.value, reverse=direction)
-            case "address":
+            case ADDRESS_BOOK_FIELDS.ADDRESS:
                 records = sorted(records, key=lambda record: record.address.value, reverse=direction)
-            case "email":
+            case ADDRESS_BOOK_FIELDS.EMAIL:
                 records = sorted(records, key=lambda record: record.email.value, reverse=direction)
-            case "phone":
+            case ADDRESS_BOOK_FIELDS.PHONE:
                 records = sorted(records, key=lambda record: "".join(phone.value for phone in record.phones), reverse=direction)
-            case "birthday":
+            case ADDRESS_BOOK_FIELDS.BIRTHDAY:
                 records = sorted(records, key=lambda record: record.birthday.value, reverse=direction)
             case _:
                 pass
 
-        view = AddressBookView(records)
-        view.output(sort_column=Sort(column=sort, order=direction_text), keyword=keyword)
+        return records
