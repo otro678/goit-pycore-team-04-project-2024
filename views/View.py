@@ -37,7 +37,6 @@ class View:
             table.add_row(*self.get_row(record, keyword))
 
         table.box = box.SIMPLE
-        console.clear()
         console.print(table, justify="center")
 
     def escape(self, s: str, keyword: str) -> str:
