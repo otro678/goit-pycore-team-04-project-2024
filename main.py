@@ -314,6 +314,10 @@ def parse_input(input_str: str) -> tuple:
 
 
 def main():
+    if sys.version_info[0:2] != (3, 12):
+        print('Sorry, app requires Python 3.12, please consult with a Readme file about the setup instructions')
+        exit(1)
+
     address_book = load_contacts()
     notes_book = load_notes()
     print("Welcome to the assistant bot!")
