@@ -2,6 +2,7 @@ from functools import wraps
 import shlex
 from typing import Callable, List
 from address_book import AddressBook, ADDRESS_BOOK_FIELDS
+from field import Birthday, Date
 from notes_book import Notebook, NOTES_BOOK_FIELDS
 from record import Record, Phone, Name
 from note import Note
@@ -186,6 +187,23 @@ def show_birthday(args, address_book: AddressBook) -> str:
     return f"Can't find {name} name"
 
 @input_error
+def get_contacts_by_birthdate(args: list, address_book: AddressBook):
+    if len(args) == 0:
+        raise ValueError("Not enough arguments. Input: get-contacts-by-birthdate to:[dd.mm.yyyy] from:[dd.mm.yyyy]")
+
+    to_date = from_date = None
+
+    for arg in args:
+        res = arg.split(':')
+        if len(res) != 2 or res[0] not in ["to", "from"]:
+            raise ValueError("Incorrect input. Input: get-contacts-by-birthdate to:[dd.mm.yyyy] from:[dd.mm.yyyy]")
+
+        to_date = Date(res[1]) if res[0] == "to" else to_date
+        from_date = Date(res[1]) if res[0] == "from" else from_date
+
+    address_book.search_by_date(from_date, to_date)
+
+@input_error
 def search_name(args: list, address_book: AddressBook):
     search(args, address_book, ADDRESS_BOOK_FIELDS.NAME)
 
@@ -356,6 +374,8 @@ def main():
                 search_tags(args, notes_book)
             case "search-body":
                 search_body(args, notes_book)
+            case "get-contacts-by-birthdate":
+                get_contacts_by_birthdate(args, address_book)
             case "exit" | "quit" | "close":
                 break
             case _:

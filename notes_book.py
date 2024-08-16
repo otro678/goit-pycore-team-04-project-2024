@@ -45,20 +45,13 @@ class Notebook(UserList):
             note_base.tags = new_note.tags
 
     def search(self, keyword: str, field: NOTES_BOOK_FIELDS, sort: NOTES_BOOK_FIELDS, direction_text: str = "asc") -> None:
-        records = [record for record in self.data if record.match(keyword)]
-        direction = False if direction_text == "asc" else True
+        if field not in NOTES_BOOK_FIELDS or sort not in NOTES_BOOK_FIELDS:
+            raise KeyError(f"Field {field} not found.")
 
-        match sort:
-            case "title":
-                records = sorted(records, key=lambda record: record.title, reverse=direction)
-            case "body":
-                records = sorted(records, key=lambda record: record.body, reverse=direction)
-            case "tags":
-                records = sorted(records, key=lambda record: "".join(tag for tag in record.tags), reverse=direction)
-            case _:
-                pass
+        notes = self.__filter(keyword, field)
+        notes = self.__sort(notes, field, direction_text)
 
-        view = NotesBookView(records)
+        view = NotesBookView(notes)
         view.output(sort_column=Sort(column=sort, order=direction_text), keyword=keyword)
 
     def __filter(self, keyword: str, field: NOTES_BOOK_FIELDS) -> List[Note]:

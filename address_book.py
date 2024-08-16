@@ -1,6 +1,8 @@
 from collections import UserDict
 from datetime import date, timedelta
 from typing import List
+
+from field import Date
 from record import Record, ADDRESS_BOOK_FIELDS
 from views.View import Sort
 from views.AddressBookView import AddressBookView
@@ -84,6 +86,11 @@ class AddressBook(UserDict):
                     "celebration_date": celebration_date})
 
         return celebration_list
+
+    def search_by_date(self, from_date: Date, to_date: Date) -> None:
+        records = [record for record in self.data.values() if record.birthday.is_between(from_date=from_date, to_date=to_date)]
+        view = AddressBookView(records)
+        view.output(sort_column=Sort(column=ADDRESS_BOOK_FIELDS.BIRTHDAY, order="ask"), keyword="")
 
     def search(self, keyword: str, field: ADDRESS_BOOK_FIELDS = ADDRESS_BOOK_FIELDS.ALL, sort: ADDRESS_BOOK_FIELDS = ADDRESS_BOOK_FIELDS.EMPTY, direction_text: str = "asc") -> None:
         if field not in ADDRESS_BOOK_FIELDS or sort not in ADDRESS_BOOK_FIELDS:
