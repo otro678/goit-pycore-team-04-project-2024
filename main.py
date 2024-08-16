@@ -1,3 +1,4 @@
+import sys
 from functools import wraps
 import shlex
 from typing import Callable, List
@@ -14,11 +15,8 @@ def input_error(func: Callable) -> Callable:
     def wrapper(*args, **kwargs):
         try:
             return func(*args, **kwargs)
-        except ValueError as e:
-            return f"[{func.__name__}] {e}"
-        except IndexError as e:
-            return f"[{func.__name__}] {e}"
-        except KeyError as e:
+        except (ValueError, IndexError, KeyError) as e:
+            sys.stderr.write(f"[{func.__name__}] {str(e)}\n")
             return f"[{func.__name__}] {e}"
     return wrapper
 
