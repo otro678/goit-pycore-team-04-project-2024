@@ -81,16 +81,16 @@ class AddressBook(UserDict):
 
             # if the celebration date fits the celebration period, add it to the list
             if celebration_date <= celebration_period:
-                celebration_list.append({
-                    "name": name,
-                    "celebration_date": celebration_date})
+                celebration_list.append(record)
 
-        return celebration_list
+
+        view = AddressBookView(celebration_list)
+        view.output(sort_column=Sort(column=ADDRESS_BOOK_FIELDS.BIRTHDAY, order="asc"), keyword="")
 
     def search_by_date(self, from_date: Date, to_date: Date) -> None:
         records = [record for record in self.data.values() if record.birthday.is_between(from_date=from_date, to_date=to_date)]
         view = AddressBookView(records)
-        view.output(sort_column=Sort(column=ADDRESS_BOOK_FIELDS.BIRTHDAY, order="ask"), keyword="")
+        view.output(sort_column=Sort(column=ADDRESS_BOOK_FIELDS.BIRTHDAY, order="asc"), keyword="")
 
     def search(self, keyword: str, field: ADDRESS_BOOK_FIELDS = ADDRESS_BOOK_FIELDS.ALL, sort: ADDRESS_BOOK_FIELDS = ADDRESS_BOOK_FIELDS.EMPTY, direction_text: str = "asc") -> None:
         if field not in ADDRESS_BOOK_FIELDS or sort not in ADDRESS_BOOK_FIELDS:
