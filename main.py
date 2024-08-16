@@ -7,7 +7,7 @@ from field import Birthday, Date
 from notes_book import Notebook, NOTES_BOOK_FIELDS
 from record import Record, Phone, Name
 from note import Note
-from serialization import save_data, load_data
+from serialization import save_data, load_contacts, load_notes
 
 
 def input_error(func: Callable) -> Callable:
@@ -154,6 +154,10 @@ def edit_name(args: list, address_book: AddressBook) -> str:
 @input_error
 def show_all(address_book: AddressBook):
     address_book.search("")
+
+@input_error
+def show_all(notes_book: Notebook) -> str:
+    notes_book.search("")
 
 
 @input_error
@@ -310,8 +314,8 @@ def parse_input(input_str: str) -> tuple:
 
 
 def main():
-    address_book = load_data()
-    notes_book = Notebook() #TODO: [SB-29] deserialize notes_book here
+    address_book = load_contacts()
+    notes_book = load_notes()
     print("Welcome to the assistant bot!")
     while True:
         input_str = input("Enter command: ")
@@ -337,7 +341,8 @@ def main():
             case "edit-name":
                 print(edit_name(args, address_book))
             case "all":
-                print(show_all(address_book))
+                show_all(address_book)
+                show_all(notes_book)
             case "add-birthday":
                 print(add_birthday(args, address_book))
             case "show-birthday":
@@ -378,7 +383,7 @@ def main():
                 print("Invalid command.")
 
     save_data(address_book)
-    #TODO: [SB-29] serialize notes_book here
+    save_data(notes_book, filename="notes.pkl")
     print("Good bye!")
 
 

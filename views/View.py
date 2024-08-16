@@ -20,14 +20,14 @@ class View:
         console = Console()
 
         if len(self.data) == 0:
-            console.print("Records not found!", style="bold red",  justify="center")
+            console.print(f"{self.title}. Records not found!", style="bold red",  justify="center")
             return
 
         table = Table(title=self.title)
 
         for column in self.header:
             if sort_column.column == column.lower():
-                table.add_column(f"{column} {"▲" if sort_column.order == "asc" else "▼"}", style="cyan", header_style="bold cyan")
+                table.add_column(f"{column} {'▲' if sort_column.order == 'asc' else '▼'}", style="cyan", header_style="bold cyan")
             else:
                 table.add_column(column)
 
