@@ -161,31 +161,6 @@ def show_all(notes_book: Notebook) -> str:
 
 
 @input_error
-def add_birthday(args, address_book: AddressBook) -> str:
-    if len(args) < 2:
-        raise ValueError("Not enough arguments. Input: add-birthday <name> <birthday>")
-
-    data = {"name": ' '.join(args[:-1]), "birthday": args[-1]}
-    record = address_book.find(data["name"])
-    if record is None:
-        return f"Can't find {data['name']} name"
-
-    record.add_birthday(data["birthday"])
-    return f"Birthday added for {data['name']}"
-
-
-@input_error
-def show_birthday(args, address_book: AddressBook) -> str:
-    if len(args) < 1:
-        raise ValueError("Not enough arguments. Input: show-birthday <name>")
-
-    name = ' '.join(args)
-    record = address_book.find(name)
-    if record is not None:
-        return f"{name} birthday is {record.birthday}"
-    return f"Can't find {name} name"
-
-@input_error
 def get_contacts_by_birthdate(args: list, address_book: AddressBook):
     if len(args) == 0:
         raise ValueError("Not enough arguments. Input: get-contacts-by-birthdate to:[dd.mm.yyyy] from:[dd.mm.yyyy]")
@@ -254,7 +229,17 @@ def search(args: list, book: Notebook | AddressBook, field: ADDRESS_BOOK_FIELDS 
 
 @input_error
 def birthdays(args, address_book: AddressBook) -> list:
-    return address_book.get_upcoming_birthdays()
+    if len(args) == 0:
+        return address_book.get_upcoming_birthdays()
+    if len(args) == 1:
+        try:
+            days = int(args[0])
+            return address_book.get_upcoming_birthdays(days_prior=days)
+        except Exception as e:
+            print(e)
+            raise ValueError("Wrong format! Command is birthdays [days_forward] (parameter is optional, default is 7 days)")    
+    else:
+        raise ValueError("Wrong format! Command is birthdays [days_forward] (parameter is optional, default is 7 days)")
 
 
 @input_error
@@ -314,6 +299,10 @@ def parse_input(input_str: str) -> tuple:
 
 
 def main():
+    if sys.version_info[0:2] != (3, 12):
+        print('Sorry, app requires Python 3.12, please consult with a Readme file about the setup instructions')
+        exit(1)
+
     address_book = load_contacts()
     notes_book = load_notes()
     print("Welcome to the assistant bot!")
@@ -343,10 +332,6 @@ def main():
             case "all":
                 show_all(address_book)
                 show_all(notes_book)
-            case "add-birthday":
-                print(add_birthday(args, address_book))
-            case "show-birthday":
-                print(show_birthday(args, address_book))
             case "birthdays":
                 print(birthdays(args, address_book))
             case "search-contacts":

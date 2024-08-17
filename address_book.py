@@ -50,7 +50,7 @@ class AddressBook(UserDict):
         else:
             raise KeyError(f"A record with name {name} not found.")
 
-    def get_upcoming_birthdays(self, days_prior: int = 7) -> list:
+    def get_upcoming_birthdays(self, days_prior: int = 7) -> None:
         """
         Returns a list of upcoming birthdays (celebration days).
         Parameters:
@@ -81,11 +81,12 @@ class AddressBook(UserDict):
 
             # if the celebration date fits the celebration period, add it to the list
             if celebration_date <= celebration_period:
-                celebration_list.append({
-                    "name": name,
-                    "celebration_date": celebration_date})
+                celebration_list.append(record)
 
-        return celebration_list
+
+        view = AddressBookView(celebration_list)
+        view.sort_column = Sort(column=ADDRESS_BOOK_FIELDS.BIRTHDAY, order="asc")
+        view.output()
 
     def search_by_date(self, from_date: Date, to_date: Date) -> None:
         records = [record for record in self.data.values() if record.birthday.is_between(from_date=from_date, to_date=to_date)]

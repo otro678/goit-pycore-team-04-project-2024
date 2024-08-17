@@ -2,7 +2,7 @@ from collections import UserList
 from typing import List
 
 from note import Note, NOTES_BOOK_FIELDS
-from views.View import View, Sort
+from views.ViewTable import ViewTable, Sort
 from views.NotesBookView import NotesBookView
 
 class Notebook(UserList):
@@ -52,7 +52,9 @@ class Notebook(UserList):
         notes = self.__sort(notes, field, direction_text)
 
         view = NotesBookView(notes)
-        view.output(sort_column=Sort(column=sort, order=direction_text), keyword=keyword)
+        view.sort_column = Sort(column=sort, order=direction_text)
+        view.keyword = keyword
+        view.output()
 
     def __filter(self, keyword: str, field: NOTES_BOOK_FIELDS) -> List[Note]:
         notes = self.data

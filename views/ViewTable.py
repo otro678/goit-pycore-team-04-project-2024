@@ -43,3 +43,6 @@ class ViewTable(View):
 
     def escape(self, s: str) -> str:
         return re.sub(rf"({re.escape(self.keyword)})", r"[b magenta not dim]\1[/]", s, flags=re.IGNORECASE)
+
+    def get_row(self, record: any) -> List[str]:
+        raise NotImplementedError("get_row is not implemented")
