@@ -62,7 +62,7 @@ class Notebook(UserList):
             case NOTES_BOOK_FIELDS.ALL:
                 notes = [note for note in notes if note.match(keyword)]
             case NOTES_BOOK_FIELDS.TAGS:
-                notes = [note for note in notes if any([note.tag.lower().find(keyword.lower()) >= 0 for tag in self.tags])]
+                notes = [note for note in notes if any([tag.lower().find(keyword.lower()) >= 0 for tag in self.tags])]
             case NOTES_BOOK_FIELDS.BODY:
                 notes = [note for note in notes if note.body.lower().find(keyword.lower()) >= 0]
             case NOTES_BOOK_FIELDS.TITLE:
