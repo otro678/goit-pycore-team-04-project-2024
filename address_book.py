@@ -4,7 +4,7 @@ from typing import List
 
 from field import Date
 from record import Record, ADDRESS_BOOK_FIELDS
-from views.ViewTable import Sort
+from views.TableView import Sort
 from views.AddressBookView import AddressBookView
 
 class AddressBook(UserDict):

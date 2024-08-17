@@ -10,7 +10,7 @@ class Sort(NamedTuple):
     column: str
     order: str
 
-class ViewTable(View):
+class TableView(View):
     header: List[str] = []
     title: str = ""
     sort_column: Sort | None = None

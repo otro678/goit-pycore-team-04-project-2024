@@ -1,14 +1,17 @@
 from typing import List
 
 from record import Record, ADDRESS_BOOK_FIELDS
-from views.ViewTable import ViewTable
+from views.TableView import TableView
+from views.View import OutputData
 
-class AddressBookView(ViewTable):
+
+class AddressBookView(TableView):
     data: List[Record]
 
     def __init__(self, contact_list: List[Record]):
         # possible validation of type
         super().__init__(contact_list)
+        self.output_data = OutputData()
         self.header = [
             ADDRESS_BOOK_FIELDS.NAME.value,
             ADDRESS_BOOK_FIELDS.PHONE.value,

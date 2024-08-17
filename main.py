@@ -8,6 +8,7 @@ from notes_book import Notebook, NOTES_BOOK_FIELDS
 from record import Record, Phone, Name
 from note import Note
 from serialization import save_data, load_contacts, load_notes
+from views.TextView import ErrorView, WarningView, InfoView
 
 
 def input_error(func: Callable) -> Callable:
@@ -16,8 +17,7 @@ def input_error(func: Callable) -> Callable:
         try:
             return func(*args, **kwargs)
         except (ValueError, IndexError, KeyError) as e:
-            sys.stderr.write(f"[{func.__name__}] {str(e)}\n")
-            return f"[{func.__name__}] {e}"
+            ErrorView(f"[{func.__name__}] {str(e)}\n").output()
     return wrapper
 
 
@@ -38,7 +38,7 @@ def populate_field(field, func, message, allow_skip=False):
                 func(input_raw)
                 break
         except ValueError as e:
-            print(e)
+            ErrorView(str(e)).output()
 
 
 def get_record_by_name(args: list, address_book: AddressBook) -> Record:
@@ -121,7 +121,7 @@ def edit_bday(args: list, address_book: AddressBook) -> str:
 @input_error
 def edit_contact(args: list, address_book: AddressBook) -> str:
     record = get_record_by_name(args, address_book)
-    print(f"Editing contact: {record.name.value}")
+    InfoView(f"Editing contact: {record.name.value}").output()
 
     replace_phones_on_a_contact(record, allow_skip=True)
     populate_field(record.email, record.add_email, "Enter new email (or 'n' to skip): ", allow_skip=True)
@@ -228,7 +228,7 @@ def search(args: list, book: Notebook | AddressBook, field: ADDRESS_BOOK_FIELDS 
     book.search(args[0], field, sort, direction)
 
 @input_error
-def birthdays(args, address_book: AddressBook) -> list:
+def birthdays(args, address_book: AddressBook) -> None:
     if len(args) == 0:
         return address_book.get_upcoming_birthdays()
     if len(args) == 1:
@@ -236,8 +236,8 @@ def birthdays(args, address_book: AddressBook) -> list:
             days = int(args[0])
             return address_book.get_upcoming_birthdays(days_prior=days)
         except Exception as e:
-            print(e)
-            raise ValueError("Wrong format! Command is birthdays [days_forward] (parameter is optional, default is 7 days)")    
+            ErrorView(str(e)).output()
+            raise ValueError("Wrong format! Command is birthdays [days_forward] (parameter is optional, default is 7 days)")
     else:
         raise ValueError("Wrong format! Command is birthdays [days_forward] (parameter is optional, default is 7 days)")
 
@@ -300,19 +300,19 @@ def parse_input(input_str: str) -> tuple:
 
 def main():
     if sys.version_info[0:2] != (3, 12):
-        print('Sorry, app requires Python 3.12, please consult with a Readme file about the setup instructions')
-        exit(1)
+        ErrorView('Sorry, app requires Python 3.12, please consult with a Readme file about the setup instructions').output()
+        sys.exit(1)
 
     address_book = load_contacts()
     notes_book = load_notes()
-    print("Welcome to the assistant bot!")
+    InfoView("Welcome to the assistant bot!").output()
     while True:
         input_str = input("Enter command: ")
         command, *args = parse_input(input_str)
 
         match command:
             case "hello":
-                print("How can I help you?")
+                InfoView("How can I help you?").output()
             case "add":
                 print(add_contact(args, address_book))
             case "delete-contact":
@@ -365,11 +365,11 @@ def main():
             case "exit" | "quit" | "close":
                 break
             case _:
-                print("Invalid command.")
+                WarningView("Invalid command.").output()
 
     save_data(address_book)
     save_data(notes_book, filename="notes.pkl")
-    print("Good bye!")
+    InfoView("Good bye!").output()
 
 
 if __name__ == "__main__":

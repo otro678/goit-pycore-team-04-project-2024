@@ -2,7 +2,7 @@ from collections import UserList
 from typing import List
 
 from note import Note, NOTES_BOOK_FIELDS
-from views.ViewTable import ViewTable, Sort
+from views.TableView import TableView, Sort
 from views.NotesBookView import NotesBookView
 
 class Notebook(UserList):
