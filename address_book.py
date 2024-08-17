@@ -4,7 +4,7 @@ from typing import List
 
 from field import Date
 from record import Record, ADDRESS_BOOK_FIELDS
-from views.View import Sort
+from views.TableView import Sort
 from views.AddressBookView import AddressBookView
 
 class AddressBook(UserDict):
@@ -50,7 +50,7 @@ class AddressBook(UserDict):
         else:
             raise KeyError(f"A record with name {name} not found.")
 
-    def get_upcoming_birthdays(self, days_prior: int = 7) -> list:
+    def get_upcoming_birthdays(self, days_prior: int = 7) -> None:
         """
         Returns a list of upcoming birthdays (celebration days).
         Parameters:
@@ -85,12 +85,14 @@ class AddressBook(UserDict):
 
 
         view = AddressBookView(celebration_list)
-        view.output(sort_column=Sort(column=ADDRESS_BOOK_FIELDS.BIRTHDAY, order="asc"), keyword="")
+        view.sort_column = Sort(column=ADDRESS_BOOK_FIELDS.BIRTHDAY, order="asc")
+        view.output()
 
     def search_by_date(self, from_date: Date, to_date: Date) -> None:
         records = [record for record in self.data.values() if record.birthday.is_between(from_date=from_date, to_date=to_date)]
         view = AddressBookView(records)
-        view.output(sort_column=Sort(column=ADDRESS_BOOK_FIELDS.BIRTHDAY, order="asc"), keyword="")
+        view.sort_column = Sort(column=ADDRESS_BOOK_FIELDS.BIRTHDAY, order="asc")
+        view.output()
 
     def search(self, keyword: str, field: ADDRESS_BOOK_FIELDS = ADDRESS_BOOK_FIELDS.ALL, sort: ADDRESS_BOOK_FIELDS = ADDRESS_BOOK_FIELDS.EMPTY, direction_text: str = "asc") -> None:
         if field not in ADDRESS_BOOK_FIELDS or sort not in ADDRESS_BOOK_FIELDS:
@@ -100,7 +102,9 @@ class AddressBook(UserDict):
         records = self.__sort(records, field, direction_text)
 
         view = AddressBookView(records)
-        view.output(sort_column=Sort(column=sort, order=direction_text), keyword=keyword)
+        view.sort_column=Sort(column=sort, order=direction_text)
+        view.keyword=keyword
+        view.output()
 
     def __filter(self, keyword: str, field: ADDRESS_BOOK_FIELDS):
         records = self.data.values()

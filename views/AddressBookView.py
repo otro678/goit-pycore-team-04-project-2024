@@ -1,14 +1,17 @@
 from typing import List
 
 from record import Record, ADDRESS_BOOK_FIELDS
-from views.View import View
+from views.TableView import TableView
+from views.View import OutputData
 
-class AddressBookView(View):
+
+class AddressBookView(TableView):
     data: List[Record]
 
     def __init__(self, contact_list: List[Record]):
         # possible validation of type
         super().__init__(contact_list)
+        self.output_data = OutputData()
         self.header = [
             ADDRESS_BOOK_FIELDS.NAME.value,
             ADDRESS_BOOK_FIELDS.PHONE.value,
@@ -17,11 +20,11 @@ class AddressBookView(View):
             ADDRESS_BOOK_FIELDS.EMAIL.value]
         self.title = "Addressbook view"
 
-    def get_row(self, record: Record, keyword: str):
+    def get_row(self, record: Record):
         return [
-            self.escape(record.name.value, keyword),
-            self.escape(", ".join(phone.value for phone in record.phones), keyword),
-            self.escape(record.address.value, keyword),
-            self.escape(str(record.birthday.value), keyword),
-            self.escape(record.email.value, keyword),
+            self.escape(record.name.value),
+            self.escape(", ".join(phone.value for phone in record.phones)),
+            self.escape(record.address.value),
+            self.escape(str(record.birthday.value)),
+            self.escape(record.email.value),
         ]
