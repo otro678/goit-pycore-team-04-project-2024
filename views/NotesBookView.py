@@ -1,9 +1,9 @@
 from typing import List
 
 from note import Note, NOTES_BOOK_FIELDS
-from views.View import View
+from views.ViewTable import ViewTable
 
-class NotesBookView(View):
+class NotesBookView(ViewTable):
     data: List[Note]
 
     def __init__(self, contact_list: List[Note]):
@@ -12,9 +12,9 @@ class NotesBookView(View):
         self.header = [NOTES_BOOK_FIELDS.TITLE.value, NOTES_BOOK_FIELDS.BODY.value, NOTES_BOOK_FIELDS.TAGS.value]
         self.title = "Notes book view"
 
-    def get_row(self, record: Note, keyword: str):
+    def get_row(self, record: Note):
         return [
-            self.escape(record.title, keyword),
-            self.escape(record.body, keyword),
-            self.escape(", ".join(tag for tag in record.tags), keyword),
+            self.escape(record.title),
+            self.escape(record.body),
+            self.escape(", ".join(tag for tag in record.tags)),
         ]
