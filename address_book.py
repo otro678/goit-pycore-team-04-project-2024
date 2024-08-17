@@ -2,7 +2,7 @@ from collections import UserDict
 from datetime import date, timedelta
 from typing import List
 
-from field import Date
+from field import Date, Name, Address, Email, Birthday
 from record import Record, ADDRESS_BOOK_FIELDS
 from views.TableView import Sort
 from views.AddressBookView import AddressBookView
@@ -112,11 +112,11 @@ class AddressBook(UserDict):
             case ADDRESS_BOOK_FIELDS.ALL:
                 records = [record for record in records if record.match(keyword)]
             case ADDRESS_BOOK_FIELDS.NAME:
-                records = [record for record in records if record.name.match(keyword)]
+                records = [record for record in records if isinstance(record.name, Name) and record.name.match(keyword)]
             case ADDRESS_BOOK_FIELDS.ADDRESS:
-                records = [record for record in records if record.address.match(keyword)]
+                records = [record for record in records if isinstance(record.address, Address) and record.address.match(keyword)]
             case ADDRESS_BOOK_FIELDS.EMAIL:
-                records = [record for record in records if record.email.match(keyword)]
+                records = [record for record in records if isinstance(record.email, Email) and record.email.match(keyword)]
             case ADDRESS_BOOK_FIELDS.EMAIL:
                 records = [record for record in records if record.match_phone(keyword)]
 
@@ -127,15 +127,15 @@ class AddressBook(UserDict):
 
         match field:
             case ADDRESS_BOOK_FIELDS.NAME:
-                records = sorted(records, key=lambda record: record.name.value, reverse=direction)
+                records = sorted(records, key=lambda record: record.name.value if isinstance(record.name, Name) else "", reverse=direction)
             case ADDRESS_BOOK_FIELDS.ADDRESS:
-                records = sorted(records, key=lambda record: record.address.value, reverse=direction)
+                records = sorted(records, key=lambda record: record.address.value if isinstance(record.address, Address) else "", reverse=direction)
             case ADDRESS_BOOK_FIELDS.EMAIL:
-                records = sorted(records, key=lambda record: record.email.value, reverse=direction)
+                records = sorted(records, key=lambda record: record.email.value if isinstance(record.email, Email) else "", reverse=direction)
             case ADDRESS_BOOK_FIELDS.PHONE:
                 records = sorted(records, key=lambda record: "".join(phone.value for phone in record.phones), reverse=direction)
             case ADDRESS_BOOK_FIELDS.BIRTHDAY:
-                records = sorted(records, key=lambda record: record.birthday.value, reverse=direction)
+                records = sorted(records, key=lambda record: record.birthday.value if isinstance(record.birthday, Birthday) else "", reverse=direction)
             case _:
                 pass
 
