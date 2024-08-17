@@ -1,5 +1,6 @@
 from typing import List
 
+from field import Field
 from record import Record, ADDRESS_BOOK_FIELDS
 from views.TableView import TableView
 from views.View import OutputData
@@ -22,9 +23,9 @@ class AddressBookView(TableView):
 
     def get_row(self, record: Record):
         return [
-            self.escape(record.name.value),
-            self.escape(", ".join(phone.value for phone in record.phones)),
-            self.escape(record.address.value),
-            self.escape(str(record.birthday.value)),
-            self.escape(record.email.value),
+            self.escape(record.name.value if isinstance(record.name, Field) else ''),
+            self.escape(", ".join(phone.value if isinstance(phone, Field) else '' for phone in record.phones)),
+            self.escape(record.address.value if isinstance(record.address, Field) else ''),
+            self.escape(str(record.birthday.value if isinstance(record.birthday, Field) else '')),
+            self.escape(record.email.value if isinstance(record.email, Field) else ''),
         ]
