@@ -16,7 +16,8 @@ class Field:
 
 
 class Name(Field):
-    pass
+    def __init__(self, value):
+        super().__init__(value)
 
 
 class Phone(Field):
@@ -37,7 +38,7 @@ class Phone(Field):
 
 class Date(Field):
     def __init__(self, value: str):
-        self.value = self.validate_date(value)
+        super().__init__(self.validate_date(value))
 
     def validate_date(self, value: str) -> datetime:
         formats = ["%d.%m.%Y", "%d %m %Y","%d/%m/%Y", "%Y-%m-%d", "%d-%m-%Y"]
@@ -77,7 +78,7 @@ class Birthday(Date):
 
 class Email(Field):
     def __init__(self, value):
-        self.value = self.validate_email(value)
+        super().__init__(self.validate_email(value))
 
     def validate_email(self, email: str) -> str:
         email_regex = r'^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$'
@@ -87,4 +88,5 @@ class Email(Field):
 
 
 class Address(Field):
-    pass
+    def __init__(self, value):
+        super().__init__(value)

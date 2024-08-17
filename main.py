@@ -42,6 +42,9 @@ def populate_field(field, func, message, allow_skip=False):
 
 
 def get_record_by_name(args: list, address_book: AddressBook) -> Record:
+    if len(args) < 1:
+        raise ValueError("Missing name as argument")
+    
     name = ' '.join(args)
     record = address_book.find(name)
     if record is None:
@@ -357,7 +360,7 @@ def main():
             case "search-tag":
                 search_tags(args, notes_book)
             case "search-title":
-                search_tags(args, notes_book)
+                search_title(args, notes_book)
             case "search-body":
                 search_body(args, notes_book)
             case "get-contacts-by-birthdate":
