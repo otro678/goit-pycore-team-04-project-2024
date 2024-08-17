@@ -63,7 +63,7 @@ search-contacts [query] sort:[field]:[asc/desc] #sort parameter works for every 
 search-notes [query]
 
 #search within a specified field
-search-name [query] 
+search-name [query]
 search-phone [query]
 search-email [query]
 search-address [query]

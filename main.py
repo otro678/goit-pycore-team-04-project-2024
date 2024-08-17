@@ -136,22 +136,22 @@ def edit_contact(args: list, address_book: AddressBook) -> str:
 def edit_name(args: list, address_book: AddressBook) -> str:
     if len(args) < 2:
         raise ValueError("Not enough arguments. Input: edit-name <old_name> <new_name>")
-    
+
     old_name = args[0]
     new_name = args[1]
-    
+
     record = address_book.find(old_name)
     if record is None:
         return f"Can't find contact with name {old_name}"
-    
+
     if address_book.find(new_name):
         return f"A contact with name {new_name} already exists."
 
     del address_book.data[old_name]
-    
+
     record.name = Name(new_name)
     address_book.add_record(record)
-    
+
     return f"Renamed contact {old_name} to {new_name}"
 
 @input_error
