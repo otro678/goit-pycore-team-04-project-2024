@@ -18,6 +18,23 @@ pip install -r requirements.txt
 python main.py
 ```
 
+Or, if you want to use it as a standalone app from anywhere in your system you should do the following:
+```bash
+conda create -n illuminapy python=3.12
+
+conda activate illuminapy
+
+pip install .
+
+```
+
+After that, open a Terminal/PowerShell app from any folder and run following commands:
+```bash
+conda activate illuminapy
+
+mason_app
+```
+
 ## Usage
 
 List of available commands:
@@ -61,10 +78,15 @@ get-contacts-by-birthdate to:[dd.mm.yyyy] from:[dd.mm.yyyy] # searches contacts 
 ## Contributing
 
 Illumina.py team:
+
 @otro678 - Serhii K
+
 @cryptophobic - Dmytro U
+
 @S3lfik - Eduard K
+
 @prymakov - Anton P
+
 @MaksDeGreez - Maks S
 
 ## License
