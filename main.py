@@ -44,7 +44,7 @@ def populate_field(field, func, message, allow_skip=False):
 def get_record_by_name(args: list, address_book: AddressBook) -> Record:
     if len(args) < 1:
         raise ValueError("Missing name as argument")
-    
+
     name = ' '.join(args)
     record = address_book.find(name)
     if record is None:
