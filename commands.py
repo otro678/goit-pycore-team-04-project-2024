@@ -12,9 +12,21 @@ def show_all(books):
     for book in books:
         book.search("")
 
-def search(book, query, field=None):
-    # book.search(query, field, sort, direction)
-    book.search(query)
+def search(book, query, field=None, sort=None):
+    fields_enum = ADDRESS_BOOK_FIELDS
+    direction = "asc"
+    if isinstance(book, Notebook):
+        fields_enum = NOTES_BOOK_FIELDS
+    if (field != None) and (field != "field"):
+        field = fields_enum(field.lower())
+    else:
+        field = fields_enum('all')
+    if (sort != None) and (sort != "sort"):
+        sort, direction = sort.values()
+        sort = fields_enum(sort.lower())
+    else:
+        sort = ""
+    book.search(query, field, sort, direction)
 
 def add_contact(address_book, name):
     record = Record(name)
@@ -124,8 +136,8 @@ command_signatures = {
     "all": [[], []],
     "all-contacts": [[], ["sort"]],
     "all-notes": [[], ["sort"]],
-    "search-contacts": [["query"], ["sort"]],
-    "search-notes": [["query"], ["sort"]],
+    "search-contacts": [["query"], ["field", "sort"]],
+    "search-notes": [["query"], ["field", "sort"]],
     "add-contact": [["Name"], []],
     "add-note": [["Title"], []],
     "edit-contact": [["Name"], []],
@@ -155,22 +167,43 @@ def parse_command(user_input: str) -> dict|None:
 
     required_params, optional_params = command_signatures[command]
 
-    optional_args_index = len(required_params)
-
     required_args = args.copy()
     optional_args = {}
 
-    for param in optional_params:
-        args_to_remove = []
-        for arg in args[optional_args_index:]:
-            if arg.startswith(f"{param}:"):
-                field, *sort_dir = arg.split(":")[1:]
-                if not sort_dir:
-                    sort_dir = ["asc"]
-                optional_args[param] = { "field": field, "sort_dir": sort_dir[0] }
-                args_to_remove.append(arg)
-        for arg in args_to_remove:
-            required_args.remove(arg)
+    args_to_remove = []
+    for arg in args:
+        if arg.startswith("sort:"):
+            split_arg = list(filter(lambda a: a, arg.split(":")[1:3]))
+            if len(split_arg) < 1:
+                print(f"'{arg}' is not valid sorting parameter. Correct format is sort:FieldName[:direction]")
+                return None
+            elif len(split_arg) == 1:
+                field = split_arg[0]
+                sort_dir = "asc"
+            else:
+                field, sort_dir = split_arg
+            if not field in ["Name", "Email", "Address", "Birthday", "Title", "Body"]:
+                print(f"Cannot sort by '{field}' field")
+                return None
+            if not (sort_dir and sort_dir.lower() in ["asc", "desc"]):
+                print(f"'{sort_dir}' is not valid sortin direction. Using 'asc' instead")
+                sort_dir = "asc"
+            optional_args["sort"] = { "field": field, "direction": sort_dir }
+            args_to_remove.append(arg)
+        elif arg.startswith("field:"):
+            try:
+                field = arg.split(":")[1]
+            except:
+                print(f"'{arg}' is not valid field parameter. Correct format is field:FieldName")
+                return None
+            if not field in ["Name", "Phone", "Email", "Address", "Birthday", "Title", "Body", "Tags"]:
+                print(f"'{field}' is not valid field")
+                return None
+            optional_args["field"] = field
+            args_to_remove.append(arg)
+
+    for arg in args_to_remove:
+        required_args.remove(arg)
 
     if required_args and (set(required_params) & set(["Name", "Title", "query"])):
         required_args = [" ".join(required_args)]
@@ -189,8 +222,8 @@ def run_command(user_input: str, address_book, notes_book):
         "all": { "func": show_all, "args": [[address_book, notes_book]] },
         "all-contacts": { "func": show_all, "args": [[address_book]] },
         "all-notes": { "func": show_all, "args": [[notes_book]] },
-        "search-contacts": { "func": search, "args": [address_book, "query"] },
-        "search-notes": { "func": search, "args": [notes_book, "query"] },
+        "search-contacts": { "func": search, "args": [address_book, "query", "field", "sort"] },
+        "search-notes": { "func": search, "args": [notes_book, "query", "field", "sort"] },
         "add-contact": { "func": add_contact, "args": [address_book, "Name"] },
         "add-note": { "func": add_note, "args": [notes_book, "Title"] },
         "edit-contact": { "func": edit_contact, "args": [address_book, "Name"] },
