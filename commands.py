@@ -8,35 +8,48 @@ from record import Record, Phone, Name
 from note import Note
 from views.TextView import ErrorView, WarningView, InfoView
 
+def input_error(func: Callable) -> Callable:
+    @wraps(func)
+    def wrapper(*args, **kwargs):
+        try:
+            return func(*args, **kwargs)
+        except (ValueError, IndexError, KeyError) as e:
+            ErrorView(f"[{func.__name__}] {str(e)}\n").output()
+    return wrapper
+
+@input_error
 def show_all(books):
     for book in books:
         book.search("")
 
+@input_error
 def search(book, query, field=None, sort=None):
     fields_enum = ADDRESS_BOOK_FIELDS
     direction = "asc"
     if isinstance(book, Notebook):
         fields_enum = NOTES_BOOK_FIELDS
-    if (field != None) and (field != "field"):
-        field = fields_enum(field.lower())
-    else:
+    if field == None:
         field = fields_enum('all')
-    if (sort != None) and (sort != "sort"):
+    else:
+        field = fields_enum(field.lower())
+    if sort == None:
+        sort = ""
+    else:
         sort, direction = sort.values()
         sort = fields_enum(sort.lower())
-    else:
-        sort = ""
     book.search(query, field, sort, direction)
 
+@input_error
 def add_contact(address_book, name):
     record = Record(name)
     address_book.add_record(record)
-    populate_field(record.phones, record.add_phone, "Enter phone numbers (separated by space): ")
-    populate_field(record.email, record.add_email, "Enter email: ")
-    populate_field(record.birthday, record.add_birthday, "Enter birthday (DD.MM.YYYY): ")
-    populate_field(record.address, record.add_address, "Enter address: ")
+    populate_field(record.phones, record.add_phone, "Enter phone numbers (separated by space): ", allow_skip=True)
+    populate_field(record.email, record.add_email, "Enter email: ", allow_skip=True)
+    populate_field(record.birthday, record.add_birthday, "Enter birthday (DD.MM.YYYY): ", allow_skip=True)
+    populate_field(record.address, record.add_address, "Enter address: ", allow_skip=True)
     return f"Added {record}"
 
+@input_error
 def add_note(notes_book, title):
     note = Note(title)
     note.body = input("Enter body: ")
@@ -44,20 +57,28 @@ def add_note(notes_book, title):
     notes_book.add_note(note)
     return f"Added {note}"
 
-def edit_contact(address_book, name):
+@input_error
+def edit_contact(address_book, name, field=None):
     record = address_book.find(name)
     if not record:
         raise ValueError(f"Contact with name {name} does not exist.")
 
     InfoView(f"Editing contact: {record.name.value}").output()
-    replace_phones_on_a_contact(record, allow_skip=True)
-    populate_field(record.email, record.add_email, "Enter new email (or 'n' to skip): ", allow_skip=True)
-    populate_field(record.birthday, record.add_birthday, "Enter new birthday (DD.MM.YYYY) (or 'n' to skip): ", allow_skip=True)
-    populate_field(record.address, record.add_address, "Enter new address (or 'n' to skip): ", allow_skip=True)
+    if field == None or field == "Name":
+        populate_field(record.name, record.edit_name, "Enter new name (or 'n' to skip): ", allow_skip=True)
+    if field == None or field == "Phone":
+        replace_phones_on_a_contact(record, allow_skip=True)
+    if field == None or field == "Email":
+        populate_field(record.email, record.add_email, "Enter new email (or 'n' to skip): ", allow_skip=True)
+    if field == None or field == "Birthday":
+        populate_field(record.birthday, record.add_birthday, "Enter new birthday (DD.MM.YYYY) (or 'n' to skip): ", allow_skip=True)
+    if field == None or field == "Address":
+        populate_field(record.address, record.add_address, "Enter new address (or 'n' to skip): ", allow_skip=True)
 
     return f"Contact {record.name.value} updated"
 
-def edit_note(notes_book, title):
+@input_error
+def edit_note(notes_book, title, field=None):
     note = notes_book.get_note_by_title(title)
     if note is None:
         current_notes_list = "\n".join([str(note) for note in notes_book.get_notes()])
@@ -65,20 +86,25 @@ def edit_note(notes_book, title):
 
     # Populate a fresh Note with values to update the existing one
     new_note = Note()
-    new_note.title = input(f"Enter new title (current: {note.title}): ")
-    new_note.body = input(f"Enter new body (current: {note.body}): ")
+    if field == None or field == "Title":
+        new_note.title = input(f"Enter new title (current: {note.title}): ")
+    if field == None or field == "Body":
+        new_note.body = input(f"Enter new body (current: {note.body}): ")
     current_tags = ",".join(note.tags)
-    new_note.tags = input(f"Enter new tags (current: {current_tags}): ").split(",")
+    if field == None or field == "Tags":
+        new_note.tags = input(f"Enter new tags (current: {current_tags}): ").split(",")
 
     notes_book.update_note(note, new_note)
     return f"Edited note {note}"
 
+@input_error
 def delete_contact(address_book, name):
     if not address_book.find(name):
         raise ValueError(f"Contact with name {name} does not exist.")
     address_book.delete(name)
     return f"Contact with name {name} deleted"
 
+@input_error
 def delete_note(notes_book, title):
     if not notes_book.get_note_by_title(title):
         raise ValueError(f"Note with title {title} does not exist.")
@@ -134,14 +160,14 @@ def replace_phones_on_a_contact(record, allow_skip=False):
 
 command_signatures = {
     "all": [[], []],
-    "all-contacts": [[], ["sort"]],
-    "all-notes": [[], ["sort"]],
+    "all-contacts": [[], []],
+    "all-notes": [[], []],
     "search-contacts": [["query"], ["field", "sort"]],
     "search-notes": [["query"], ["field", "sort"]],
     "add-contact": [["Name"], []],
     "add-note": [["Title"], []],
-    "edit-contact": [["Name"], []],
-    "edit-note": [["Title"], []],
+    "edit-contact": [["Name"], ["field"]],
+    "edit-note": [["Title"], ["field"]],
     "delete-contact": [["Name"], []],
     "delete-note": [["Title"], []],
     "show-birthdays": [["days"], []],
@@ -186,7 +212,7 @@ def parse_command(user_input: str) -> dict|None:
                 print(f"Cannot sort by '{field}' field")
                 return None
             if not (sort_dir and sort_dir.lower() in ["asc", "desc"]):
-                print(f"'{sort_dir}' is not valid sortin direction. Using 'asc' instead")
+                print(f"'{sort_dir}' is not valid sorting direction. Using 'asc' instead")
                 sort_dir = "asc"
             optional_args["sort"] = { "field": field, "direction": sort_dir }
             args_to_remove.append(arg)
@@ -226,8 +252,8 @@ def run_command(user_input: str, address_book, notes_book):
         "search-notes": { "func": search, "args": [notes_book, "query", "field", "sort"] },
         "add-contact": { "func": add_contact, "args": [address_book, "Name"] },
         "add-note": { "func": add_note, "args": [notes_book, "Title"] },
-        "edit-contact": { "func": edit_contact, "args": [address_book, "Name"] },
-        "edit-note": { "func": edit_note, "args": [notes_book, "Title"] },
+        "edit-contact": { "func": edit_contact, "args": [address_book, "Name", "field"] },
+        "edit-note": { "func": edit_note, "args": [notes_book, "Title", "field"] },
         "delete-contact": { "func": delete_contact, "args": [address_book, "Name"] },
         "delete-note": { "func": delete_note, "args": [notes_book, "Title"] },
         "show-birthdays": { "func": show_birthdays, "args": [address_book, "days"] },
@@ -245,5 +271,6 @@ def run_command(user_input: str, address_book, notes_book):
     if not mapped_command:
         return None
     func_args = [parsed_command["arguments"].get(str(item), item) for item in mapped_command["args"]]
+    func_args = [None if arg in ["field", "sort"] else arg for arg in func_args]
 
     return mapped_command["func"](*func_args)

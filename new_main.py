@@ -14,7 +14,9 @@ def main():
 
     try:
         while True:
-            print(run_command(input("Enter command: "), address_book, notes_book))
+            run_result = run_command(input("Enter command: "), address_book, notes_book)
+            if run_result != None:
+                print(run_result)
     except (EOFError, KeyboardInterrupt):
         pass
     finally:
