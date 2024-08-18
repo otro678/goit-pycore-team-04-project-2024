@@ -1,4 +1,5 @@
 from enum import Enum
+from rich.markup import escape
 
 from views.View import View
 
@@ -10,7 +11,7 @@ class TextType(Enum):
 
 class TextView(View):
     def __init__(self, text: str, text_type: TextType = TextType.INFO):
-        self.output_data.data = text
+        self.output_data.data = escape(text)
         match text_type:
             case TextType.ERROR:
                 self.output_data.style = "bold red"

@@ -56,3 +56,6 @@ class Record:
 
     def add_address(self, address: str):
         self.address = Address(address)
+
+    def edit_name(self, new_name: str):
+        self.name = Name(new_name)

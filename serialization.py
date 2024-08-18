@@ -35,7 +35,7 @@ def load_contacts(filename="addressbook.pkl"):
             return pickle.load(f)
     except FileNotFoundError:
         return AddressBook()  # Повернення нової адресної книги, якщо файл не знайдено
-    
+
 def load_notes(filename="notes.pkl"):
     """
     Loads an notes book from a pickle file, or creates a new one if the file does not exist.

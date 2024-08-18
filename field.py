@@ -28,7 +28,7 @@ class Phone(Field):
         pattern = r"^(\(?\d{3}\)?[-]?\d{2,3}[-]?\d{2}[-]?\d{2,4}|\d{10})$"
         if not re.match(pattern, phone):
             raise ValueError(f"Invalid phone number: {phone}.")
-        
+
         clean_phone = re.sub(r'\D', '', phone)
 
         if len(clean_phone) != 10:

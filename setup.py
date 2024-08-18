@@ -11,11 +11,11 @@ setup(
     author='Serhii Kozachenko',
     author_email='serhii.kozachenko.92@gmail.com',
     packages=find_packages(),
-    py_modules=['main', 'address_book', 'notes_book', 'record', 'note', 'serialization', 'field', 'views.View', 'views.TableView', 'views.TextView', 'views.NotesBookView', 'views.AddressBookView'],
+    py_modules=['main', 'new_main', 'commands', 'address_book', 'notes_book', 'record', 'note', 'serialization', 'field', 'views.View', 'views.TableView', 'views.TextView', 'views.NotesBookView', 'views.AddressBookView'],
     install_requires=parse_requirements('requirements.txt'),
     entry_points={
         'console_scripts': [
-            'mason_app=main:main',
+            'mason_app=new_main:main',
         ],
     },
 )

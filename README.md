@@ -38,42 +38,22 @@ mason_app
 ## Usage
 
 List of available commands:
-```python
-hello # shows greeting message
-all # shows all contacts and notes
 
-add-contact [name] # starts contact adding
-delete-contact [name] # deletes a specified contact
-
-add-note [title] # starts note adding
-delete-note [title] # deletes a specified note
-
-# those commands let user to edit a specified field
-edit-phone [name]
-edit-email [name]
-edit-address [name]
-edit-bday [name]
-edit-name [old-name] [new-name]
-
-edit-contact [name] # multi-step contact editing, n skips the field and keeps it unchanged
-edit-note [title] # multi-step note editing, n skips the field and keeps it unchanged
-
-# search within all the fields
-search-contacts [query] sort:[field]:[asc/desc] #sort parameter works for every search command including ones below
-search-notes [query]
-
-#search within a specified field
-search-name [query] 
-search-phone [query]
-search-email [query]
-search-address [query]
-search-tag [query]
-search-title [query]
-search-body [query]
-
-birthdays [days] (parameter is optional, defaults to 7 days) # shows the contacts who has birthday in [x] days
-get-contacts-by-birthdate to:[dd.mm.yyyy] from:[dd.mm.yyyy] # searches contacts with birthdays within a specified range
-```
+- `all` - prints all Contacts and Notes
+- `all-contacts` - prints all Contacts
+- `all-notes` - prints all Notes
+- `search-contacts <query string> [field:<FieldName>] [sort:<FieldName>[:direction]]` - performs search in Contacts; if `field` parameter is set - search is done only by this field; if `sort` param is set - search results are sorted by this field
+- `search-notes <query string> [field:FieldName] [sort:FieldName[:direction]]` - performs search in Notes; if `field` parameter is set - search is done only by this field; if `sort` param is set - search results are sorted by this field
+- `add-contact <Name>` - creates new Contact initialized with Name field
+- `add-note <Title>` - creates new Note initialized with Title field
+- `edit-contact <Name> [field:FieldName]` - searches for Contact by Name and starts fields edit procedure; if `field` param is passed - allows only to edit this field
+- `edit-note <Title> [field:FieldName]` - searches for Note by Title and starts fields edit procedure; if `field` param is passed - allows only to edit this field
+- `delete-contact <Name>` - deletes Contact found by Name
+- `delete-note <Title>` - deletes Note found by Title
+- `show-birthdays <days>` - shows Contacts whose Birthdays are happening in the closest `days` in the future
+- `close`, `exit`, `quit`, `stop`, `Ctrl+C`, `Ctrl+D` - saves current Contacts/Notes and stops the Bot
+- `hello` - prints greeting message
+- `help` - prints all available commands list
 
 ## Contributing
 
