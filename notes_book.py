@@ -49,7 +49,7 @@ class Notebook(UserList):
             raise KeyError(f"Field {field} not found.")
 
         notes = self.__filter(keyword, field)
-        notes = self.__sort(notes, field, direction_text)
+        notes = self.__sort(notes, sort, direction_text)
 
         view = NotesBookView(notes)
         view.sort_column = Sort(column=sort, order=direction_text)

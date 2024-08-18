@@ -99,7 +99,7 @@ class AddressBook(UserDict):
             raise KeyError(f"Field {field} not found.")
 
         records = self.__filter(keyword, field)
-        records = self.__sort(records, field, direction_text)
+        records = self.__sort(records, sort, direction_text)
 
         view = AddressBookView(records)
         view.sort_column=Sort(column=sort, order=direction_text)
