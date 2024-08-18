@@ -216,12 +216,12 @@ def parse_command(user_input: str) -> dict|None:
     command = command.lower()
 
     if not command in command_signatures.keys():
-        print(f"'{command}' is not a valid command.")
+        ErrorView(f"'{command}' is not a valid command.").output()
         return None
 
     args = list(filter(lambda a : a, [arg.strip() for arg in args]))
 
-    required_params, optional_params = command_signatures[command]
+    required_params, _optional_params = command_signatures[command]
 
     required_args = args.copy()
     optional_args = {}
@@ -231,7 +231,7 @@ def parse_command(user_input: str) -> dict|None:
         if arg.startswith("sort:"):
             split_arg = list(filter(lambda a: a, arg.split(":")[1:3]))
             if len(split_arg) < 1:
-                print(f"'{arg}' is not valid sorting parameter. Correct format is sort:FieldName[:direction]")
+                ErrorView(f"'{arg}' is not valid sorting parameter. Correct format is sort:FieldName[:direction]").output()
                 return None
             elif len(split_arg) == 1:
                 field = split_arg[0]
@@ -239,10 +239,10 @@ def parse_command(user_input: str) -> dict|None:
             else:
                 field, sort_dir = split_arg
             if not field in ["Name", "Email", "Address", "Birthday", "Title", "Body"]:
-                print(f"Cannot sort by '{field}' field")
+                ErrorView(f"Cannot sort by '{field}' field").output()
                 return None
             if not (sort_dir and sort_dir.lower() in ["asc", "desc"]):
-                print(f"'{sort_dir}' is not valid sorting direction. Using 'asc' instead")
+                WarningView(f"'{sort_dir}' is not valid sorting direction. Using 'asc' instead").output()
                 sort_dir = "asc"
             optional_args["sort"] = { "field": field, "direction": sort_dir }
             args_to_remove.append(arg)
@@ -250,10 +250,10 @@ def parse_command(user_input: str) -> dict|None:
             try:
                 field = arg.split(":")[1]
             except:
-                print(f"'{arg}' is not valid field parameter. Correct format is field:FieldName")
+                ErrorView(f"'{arg}' is not valid field parameter. Correct format is field:FieldName").output()
                 return None
             if not field in ["Name", "Phone", "Email", "Address", "Birthday", "Title", "Body", "Tags"]:
-                print(f"'{field}' is not valid field")
+                ErrorView(f"'{field}' is not valid field").output()
                 return None
             optional_args["field"] = field
             args_to_remove.append(arg)
@@ -265,7 +265,7 @@ def parse_command(user_input: str) -> dict|None:
         required_args = [" ".join(required_args)]
 
     if len(required_args) != len(required_params):
-        print(f"Check required params are present: {", ".join(required_params)}.")
+        ErrorView(f"Check required params are present: {", ".join(required_params)}.").output()
         return None
 
     return {
