@@ -124,7 +124,23 @@ def stop_bot():
     exit(0)
 
 def print_help():
-    pass                                                                                                                                        # TODO: implement this function
+    InfoView("""
+"all" - prints all Contacts and Notes
+"all-contacts" - prints all Contacts
+"all-notes" - prints all Notes
+"search-contacts <query string> [field:<FieldName>] [sort:<FieldName>[:direction]]" - performs search in Contacts
+"search-notes <query string> [field:FieldName] [sort:FieldName[:direction]]" - performs search in Notes
+"add-contact <Name>" - creates new Contact initialized with Name field
+"add-note <Title>" - creates new Note initialized with Title field
+"edit-contact <Name> [field:FieldName]" - searches for Contact by Name and starts fields edit procedure
+"edit-note <Title> [field:FieldName]" - searches for Note by Title and starts fields edit procedure
+"delete-contact <Name>" - deletes Contact found by Name
+"delete-note <Title>" - deletes Note found by Title
+"show-birthdays <days>" - shows Contacts whose Birthdays are happening in the closest "days" in the future
+"close", "exit", "quit", "stop", "Ctrl+C", "Ctrl+D" - saves current Contacts/Notes and stops the Bot
+"hello" - prints greeting message
+"help" - prints this message
+""").output()
 
 def populate_field(field, func, message, allow_skip=False):
     while True:
