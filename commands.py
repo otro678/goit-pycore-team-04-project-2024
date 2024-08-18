@@ -29,11 +29,11 @@ def search(book, query, field=None, sort=None):
     direction = "asc"
     if isinstance(book, Notebook):
         fields_enum = NOTES_BOOK_FIELDS
-    if field == None:
+    if field is None:
         field = fields_enum('all')
     else:
         field = fields_enum(field.lower())
-    if sort == None:
+    if sort is None:
         sort = ""
     else:
         sort, direction = sort.values()
