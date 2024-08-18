@@ -1,3 +1,4 @@
+import readline
 import shlex
 from functools import wraps
 from typing import Callable, List
@@ -174,9 +175,38 @@ command_signatures = {
     "close": [[], []],
     "exit": [[], []],
     "quit": [[], []],
+    "stop": [[], []],
     "hello": [[], []],
     "help": [[], []]
 }
+
+class CommandsCompleter(object):
+    def __init__(self, options):
+        self.options = sorted(options)
+        return
+
+    def complete(self, text, state):
+        response = None
+        if state == 0:
+            if text:
+                self.matches = [s for s in self.options if s and s.startswith(text)]
+            else:
+                self.matches = self.options[:]
+
+        try:
+            if readline.get_begidx() > 0:
+                response = None
+            else:
+                response = self.matches[state]
+        except IndexError:
+            response = None
+
+        return response
+
+def init_autocomplete():
+    readline.set_completer(CommandsCompleter([f"{cmd} " for cmd in command_signatures.keys()]).complete)
+    readline.set_completer_delims(" ")
+    readline.parse_and_bind('tab: complete')
 
 def parse_command(user_input: str) -> dict|None:
     try:
@@ -260,6 +290,7 @@ def run_command(user_input: str, address_book, notes_book):
         "close": { "func": stop_bot, "args": [] },
         "exit": { "func": stop_bot, "args": [] },
         "quit": { "func": stop_bot, "args": [] },
+        "stop": { "func": stop_bot, "args": [] },
         "hello": { "func": print, "args": ["How can I help you?"]},
         "help": { "func": print_help, "args": []}
     }

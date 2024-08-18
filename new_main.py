@@ -11,6 +11,7 @@ def main():
     address_book = load_contacts()
     notes_book = load_notes()
     InfoView("Welcome to the assistant bot!").output()
+    init_autocomplete()
 
     try:
         while True:
